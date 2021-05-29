@@ -114,6 +114,10 @@ define(["model/flow", "util"], function(Flow, Util) {
             me._showFlowSource();
         });
 
+        this._heading.append("button").classed("glyphicon glyphicon-education flowbutton", true).on("click", function() {
+            me._showEducation();
+        });
+
         this._heading.append("button").classed("glyphicon glyphicon-remove-circle flowbutton", true).on("click", function() {
             me._removeNode();
         }).style("visibility", "hidden");
@@ -382,6 +386,46 @@ define(["model/flow", "util"], function(Flow, Util) {
         d3.select("#" + container_id).append("pre").attr("id", "flow_source_text");
         var value = js_beautify(JSON.stringify(this._currentFlow.flow()));
         $("#flow_source_text").text(value);
+        $("#" + modal_id).modal("show");
+    };
+
+    Canvas.prototype._showEducation = function () {
+        var modal_id = "education_modal";
+        var container_id = "education_container";
+
+        Util.getModal(modal_id, "Choose your dataset", function (modal) {
+            var choosed_files = [];
+            var body = modal.select(".modal-body");
+            body.attr("id", container_id).style("overflow", "auto");
+            var footer = modal.select(".modal-footer");
+            footer.append("button").attr("type","button").classed("btn btn-default",true).attr("data-dismiss","modal").text("Confirm").on("click", function () {
+                d3.selectAll('input[name="dataset_checkbox"]:checked').each(function(d,i) {
+                     choosed_files.push(d3.select(this).attr('value'))
+                });
+                post_data = {'filenames': choosed_files};
+                $.ajax({
+                    type: "POST",
+                    url: "/post_files",
+                    contentType: 'application/json',
+                    data: JSON.stringify(post_data),
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log(data);
+                        choosed_files = [];
+                    }
+                });
+            })
+
+        });
+
+        $.get("/dataset", function(data) {
+            console.log(data);
+            var flowItems = d3.select("#" + container_id).append("ul").selectAll("li").data(data).enter().append("li").append("div").attr('class','checkbox checkbox-primary').html(function(d) {
+                return "<input name='dataset_checkbox' type='checkbox' value='"+ d +"'/><label for='dataset_checkbox'>"+ d +"</label>"
+            });
+        });
+
+        $("#" + container_id).empty();
         $("#" + modal_id).modal("show");
     };
 

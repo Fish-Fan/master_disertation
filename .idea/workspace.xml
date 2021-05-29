@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8f30b0b3-7f2e-402e-a596-611ebc1cca9c" name="Default" comment="" />
+    <list default="true" id="8f30b0b3-7f2e-402e-a596-611ebc1cca9c" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/playground.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/pyflow.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/pyflow.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qqq.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dataset/qqq.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/repo.db" beforeDir="false" afterPath="$PROJECT_DIR$/repo.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/site1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dataset/site1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/site2.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dataset/site2.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/components/flowCanvas.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/components/flowCanvas.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -31,22 +43,23 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="331" />
-    <option name="y" value="94" />
-    <option name="width" value="1409" />
-    <option name="height" value="927" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1rTWiFo9KOmJAqiUG0tU0C9qjWA" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
@@ -57,6 +70,12 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resoures/img" />
+      <recent name="$PROJECT_DIR$/dataset" />
+    </key>
   </component>
   <component name="RunManager" selected="Python.server">
     <configuration default="true" type="DjangoTestsConfigurationType">
@@ -156,9 +175,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="D:\Anaconda3\python.exe" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -309,30 +328,95 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1529398432115</updated>
-      <workItem from="1619000689943" duration="2145000" />
+      <workItem from="1619000689943" duration="3940000" />
+      <workItem from="1619430889538" duration="2923000" />
+      <workItem from="1620057707674" duration="185000" />
+      <workItem from="1621267563008" duration="378000" />
+      <workItem from="1621863993990" duration="21457000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="WindowStateProjectService">
-    <state width="239" height="498" key="HiddenNamespacesPopup" timestamp="1619000720679">
+    <state x="360" y="235" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1619431885869">
       <screen x="0" y="23" width="1792" height="1097" />
     </state>
-    <state width="239" height="498" key="HiddenNamespacesPopup/0.23.1792.1097@0.23.1792.1097" timestamp="1619000720679" />
-    <state x="397" y="210" key="SettingsEditor" timestamp="1619001341145">
+    <state x="360" y="235" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1792.1097@0.23.1792.1097" timestamp="1619431885869" />
+    <state x="659" y="287" key="#xdebugger.evaluate" timestamp="1622286416022">
       <screen x="0" y="23" width="1792" height="1097" />
     </state>
-    <state x="397" y="210" key="SettingsEditor/0.23.1792.1097@0.23.1792.1097" timestamp="1619001341145" />
-    <state width="500" height="445" key="SwitcherDM" timestamp="1619002816133">
+    <state x="659" y="287" key="#xdebugger.evaluate/0.23.1792.1097@0.23.1792.1097" timestamp="1622286416022" />
+    <state x="683" y="334" key="FileChooserDialogImpl" timestamp="1619431660889">
       <screen x="0" y="23" width="1792" height="1097" />
     </state>
-    <state width="500" height="445" key="SwitcherDM/0.23.1792.1097@0.23.1792.1097" timestamp="1619002816133" />
-    <state x="551" y="217" width="689" height="708" key="find.popup" timestamp="1619002401419">
+    <state x="683" y="334" key="FileChooserDialogImpl/0.23.1792.1097@0.23.1792.1097" timestamp="1619431660889" />
+    <state width="1750" height="373" key="GridCell.Tab.0.bottom" timestamp="1622287031437">
       <screen x="0" y="23" width="1792" height="1097" />
     </state>
-    <state x="551" y="217" width="689" height="708" key="find.popup/0.23.1792.1097@0.23.1792.1097" timestamp="1619002401419" />
+    <state width="1750" height="373" key="GridCell.Tab.0.bottom/0.23.1792.1097@0.23.1792.1097" timestamp="1622287031437" />
+    <state width="1750" height="373" key="GridCell.Tab.0.center" timestamp="1622287031436">
+      <screen x="0" y="23" width="1792" height="1097" />
+    </state>
+    <state width="1750" height="373" key="GridCell.Tab.0.center/0.23.1792.1097@0.23.1792.1097" timestamp="1622287031436" />
+    <state width="1750" height="373" key="GridCell.Tab.0.left" timestamp="1622287031436">
+      <screen x="0" y="23" width="1792" height="1097" />
+    </state>
+    <state width="1750" height="373" key="GridCell.Tab.0.left/0.23.1792.1097@0.23.1792.1097" timestamp="1622287031436" />
+    <state width="1750" height="373" key="GridCell.Tab.0.right" timestamp="1622287031437">
+      <screen x="0" y="23" width="1792" height="1097" />
+    </state>
+    <state width="1750" height="373" key="GridCell.Tab.0.right/0.23.1792.1097@0.23.1792.1097" timestamp="1622287031437" />
+    <state width="1750" height="373" key="GridCell.Tab.1.bottom" timestamp="1622287010293">
+      <screen x="0" y="23" width="1792" height="1097" />
+    </state>
+    <state width="1750" height="373" key="GridCell.Tab.1.bottom/0.23.1792.1097@0.23.1792.1097" timestamp="1622287010293" />
+    <state width="1750" height="373" key="GridCell.Tab.1.center" timestamp="1622287010293">
+      <screen x="0" y="23" width="1792" height="1097" />
+    </state>
+    <state width="1750" height="373" key="GridCell.Tab.1.center/0.23.1792.1097@0.23.1792.1097" timestamp="1622287010293" />
+    <state width="1750" height="373" key="GridCell.Tab.1.left" timestamp="1622287010292">
+      <screen x="0" y="23" width="1792" height="1097" />
+    </state>
+    <state width="1750" height="373" key="GridCell.Tab.1.left/0.23.1792.1097@0.23.1792.1097" timestamp="1622287010292" />
+    <state width="1750" height="373" key="GridCell.Tab.1.right" timestamp="1622287010293">
+      <screen x="0" y="23" width="1792" height="1097" />
+    </state>
+    <state width="1750" height="373" key="GridCell.Tab.1.right/0.23.1792.1097@0.23.1792.1097" timestamp="1622287010293" />
+    <state width="239" height="498" key="HiddenNamespacesPopup" timestamp="1621869210936">
+      <screen x="0" y="23" width="1792" height="1097" />
+    </state>
+    <state width="239" height="498" key="HiddenNamespacesPopup/0.23.1792.1097@0.23.1792.1097" timestamp="1621869210936" />
+    <state x="25" y="151" key="SettingsEditor" timestamp="1622125812638">
+      <screen x="0" y="23" width="1792" height="1097" />
+    </state>
+    <state x="25" y="151" key="SettingsEditor/0.23.1792.1097@0.23.1792.1097" timestamp="1622125812638" />
+    <state width="500" height="445" key="SwitcherDM" timestamp="1622286927753">
+      <screen x="0" y="23" width="1792" height="1097" />
+    </state>
+    <state width="500" height="445" key="SwitcherDM/0.23.1792.1097@0.23.1792.1097" timestamp="1622286927753" />
+    <state width="896" height="548" key="XDebugger.FullValuePopup" timestamp="1619432383862">
+      <screen x="0" y="23" width="1792" height="1097" />
+    </state>
+    <state width="896" height="548" key="XDebugger.FullValuePopup/0.23.1792.1097@0.23.1792.1097" timestamp="1619432383862" />
+    <state x="551" y="217" width="689" height="708" key="find.popup" timestamp="1622284701993">
+      <screen x="0" y="23" width="1792" height="1097" />
+    </state>
+    <state x="551" y="217" width="689" height="708" key="find.popup/0.23.1792.1097@0.23.1792.1097" timestamp="1622284701993" />
     <state x="561" y="268" width="670" height="676" key="search.everywhere.popup" timestamp="1619001217563">
       <screen x="0" y="23" width="1792" height="1097" />
     </state>
@@ -344,6 +428,31 @@
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/fbp/flow.py</url>
           <line>133</line>
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/server.py</url>
+          <line>162</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fbp/__init__.py</url>
+          <line>82</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fbp/flow.py</url>
+          <line>169</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/server.py</url>
+          <line>141</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/server.py</url>
+          <line>119</line>
+          <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/static/js/components/flowInspector.js</url>
@@ -357,5 +466,8 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/pyflow$server.coverage" NAME="server Coverage Results" MODIFIED="1622287001782" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

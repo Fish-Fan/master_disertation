@@ -1,9 +1,8 @@
 from flask import Flask
 from flask import request
 from flask import jsonify
-import pandas as pd
-
-import os
+from os import listdir
+import os.path
 import json
 
 import fbp
@@ -130,6 +129,21 @@ def flows():
 
         result = [v for k, v in flows.items()]
         return jsonify(result)
+
+@app.route("/dataset", methods=['GET', 'POST'])
+def getDataset():
+    path = './dataset'
+    filenames = [f for f in listdir(path) if os.path.isfile(os.path.join(path, f))]
+    print(filenames)
+    return jsonify(filenames)
+
+@app.route("/post_files", methods=["POST"])
+def receiveDataset():
+    request_dict = request.json
+    filenames = request_dict.get('filenames')
+    print(filenames)
+    return jsonify(filenames)
+
 
 
 @app.route("/flows/<id>", methods=['GET'])
