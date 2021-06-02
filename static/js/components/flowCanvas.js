@@ -392,6 +392,7 @@ define(["model/flow", "util"], function(Flow, Util) {
     Canvas.prototype._showEducation = function () {
         var modal_id = "education_modal";
         var container_id = "education_container";
+        var me = this;
 
         Util.getModal(modal_id, "Choose your dataset", function (modal) {
             var choosed_files = [];
@@ -410,7 +411,7 @@ define(["model/flow", "util"], function(Flow, Util) {
                     data: JSON.stringify(post_data),
                     dataType: 'json',
                     success: function (data) {
-                        console.log(data);
+                        me._loadflow(data);
                         choosed_files = [];
                     }
                 });

@@ -1,0 +1,127 @@
+{
+  "id": "task2",
+  "links": [
+    {
+      "source": "node1530557871409:out",
+      "target": "node1530557873554:data"
+    },
+    {
+      "source": "node1530557873554:out",
+      "target": "node1530557876248:data"
+    },
+    {
+      "source": "node1530557876248:out",
+      "target": "node1530557879806:data"
+    },
+    {
+      "source": "node1530557879806:out",
+      "target": "node1530733804391:data"
+    },
+    {
+      "source": "node1530733804391:out",
+      "target": "node1530733810039:data"
+    }
+  ],
+  "name": "task2",
+  "nodes": [
+    {
+      "id": "node1530557871409",
+      "name": "read",
+      "ports": [
+        {
+          "name": "filename",
+          "value": "site1.csv"
+        }
+      ],
+      "spec_id": "pyflow.read",
+      "ui": {
+        "x": "18px",
+        "y": "37px"
+      }
+    },
+    {
+      "id": "node1530557873554",
+      "name": "day_of_week",
+      "ports": [
+        {
+          "name": "i",
+          "value": "0"
+        }
+      ],
+      "spec_id": "pyflow.day_of_week",
+      "ui": {
+        "x": "231px",
+        "y": "42px"
+      }
+    },
+    {
+      "id": "node1530557876248",
+      "name": "filter",
+      "ports": [
+        {
+          "name": "condition",
+          "value": "day_of_week=='Monday'"
+        }
+      ],
+      "spec_id": "pyflow.filter",
+      "ui": {
+        "x": "436px",
+        "y": "49px"
+      }
+    },
+    {
+      "id": "node1530557879806",
+      "name": "filter",
+      "ports": [
+        {
+          "name": "condition",
+          "value": "DirectionDescription=='North'"
+        }
+      ],
+      "spec_id": "pyflow.filter",
+      "ui": {
+        "x": "417px",
+        "y": "167.00001525878906px"
+      }
+    },
+    {
+      "id": "node1530733804391",
+      "name": "groupby_sum",
+      "ports": [
+        {
+          "name": "cname",
+          "value": "Class2Volume"
+        },
+        {
+          "name": "key",
+          "value": "hour"
+        }
+      ],
+      "spec_id": "pyflow.groupby_sum",
+      "ui": {
+        "x": "431px",
+        "y": "294.00001525878906px"
+      }
+    },
+    {
+      "id": "node1530733810039",
+      "is_end": 1,
+      "name": "line_plot",
+      "ports": [
+        {
+          "name": "cname",
+          "value": "Class2Volume"
+        },
+        {
+          "name": "filename",
+          "value": "task2.pdf"
+        }
+      ],
+      "spec_id": "pyflow.line_plot",
+      "ui": {
+        "x": "455px",
+        "y": "402.00001525878906px"
+      }
+    }
+  ]
+}

@@ -141,8 +141,9 @@ def getDataset():
 def receiveDataset():
     request_dict = request.json
     filenames = request_dict.get('filenames')
-    print(filenames)
-    return jsonify(filenames)
+    with open('resoures/text/task2.json') as f:
+        result = json.load(f)
+    return jsonify(result)
 
 
 
