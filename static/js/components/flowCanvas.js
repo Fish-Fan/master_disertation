@@ -1,4 +1,4 @@
-define(["model/flow", "util"], function(Flow, Util) {
+define(["model/flow", "util", 'socket'], function(Flow, Util, Socket) {
     //Global Paint Styles
     var connectorPaintStyle = {
             strokeWidth: 2,
@@ -389,46 +389,50 @@ define(["model/flow", "util"], function(Flow, Util) {
         $("#" + modal_id).modal("show");
     };
 
-    Canvas.prototype._showEducation = function () {
-        var modal_id = "education_modal";
-        var container_id = "education_container";
-        var me = this;
-
-        Util.getModal(modal_id, "Choose your dataset", function (modal) {
-            var choosed_files = [];
-            var body = modal.select(".modal-body");
-            body.attr("id", container_id).style("overflow", "auto");
-            var footer = modal.select(".modal-footer");
-            footer.append("button").attr("type","button").classed("btn btn-default",true).attr("data-dismiss","modal").text("Confirm").on("click", function () {
-                d3.selectAll('input[name="dataset_checkbox"]:checked').each(function(d,i) {
-                     choosed_files.push(d3.select(this).attr('value'))
-                });
-                post_data = {'filenames': choosed_files};
-                $.ajax({
-                    type: "POST",
-                    url: "/post_files",
-                    contentType: 'application/json',
-                    data: JSON.stringify(post_data),
-                    dataType: 'json',
-                    success: function (data) {
-                        me._loadflow(data);
-                        choosed_files = [];
-                    }
-                });
-            })
-
-        });
-
+    //pop modal to choose dataset
+    Canvas.prototype._showEducation = function() {
         $.get("/dataset", function(data) {
-            console.log(data);
-            var flowItems = d3.select("#" + container_id).append("ul").selectAll("li").data(data).enter().append("li").append("div").attr('class','checkbox checkbox-primary').html(function(d) {
-                return "<input name='dataset_checkbox' type='checkbox' value='"+ d +"'/><label for='dataset_checkbox'>"+ d +"</label>"
+            var id = 'education', type = 'checkbox';
+            Util.generateModalwithInput(id, 'Choose your dataset', data, type, () => {
+                var array = [];
+                d3.selectAll('input[name="'+ id +'_'+ type +'"]:checked').each(function(d,i) {
+                     array.push(d3.select(this).attr('value'))
+                });
+                post_data = {'filenames': array};
+                Socket.post_files(post_data);
             });
         });
-
-        $("#" + container_id).empty();
-        $("#" + modal_id).modal("show");
     };
+    // pop modal to choose datetime column
+    Socket.on('columns', (response) => {
+        var id = 'dateTimeModal', type = 'radio';
+        Util.generateModalwithInput(id, 'Choose your datetime column', response, type, () => {
+            var array = [];
+            d3.selectAll('input[name="'+ id +'_'+ type +'"]:checked').each(function (d, i) {
+                    array.push(d3.select(this).attr('value'))
+                });
+            post_data = {'datetimeColumn': array};
+            Socket.post_datetime_column(post_data);
+        });
+    });
+
+    // socket.emit('post_files',post_data, (response) => {
+    //     console.log(response)
+    // });
+    // socket.on('columns', (response) => {
+    //     console.log(response)
+    // });
+    // $.ajax({
+    //     type: "POST",
+    //     url: "/post_files",
+    //     contentType: 'application/json',
+    //     data: JSON.stringify(post_data),
+    //     dataType: 'json',
+    //     success: function (data) {
+    //         me._loadflow(data);
+    //         choosed_files = [];
+    //     }
+    // });
 
     Canvas.prototype._clear = function() {
         this._instance.reset();

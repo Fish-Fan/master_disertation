@@ -6,15 +6,19 @@
 </head>
 <body>
     <ul id = "list">
+        <label for="input1">A<input type="radio" name="input1"></label>
+        <label for="input1">B<input type="radio" name="input1"></label>
+        <label for="input1">C<input type="radio" name="input1"></label>
+        <label for="input1">D<input type="radio" name="input1"></label>
     </ul>
     <script type="text/javascript" src="node_modules/d3/build/d3.min.js"></script>
+    <script type="text/javascript" src="./node_modules/requirejs/require.js"></script>
     <script>
-        d3.select("#list").selectAll("li")
-           .data([10, 20, 30, 25, 15])
-           .enter()
-           .append("li")
-           .html(function(d)
-              { return "<p>"+ d +"<input name='fanyank' type='radio'/></p>" });
+        require(['js/playground/counter'], function(counter) {
+            console.log(counter.getValue());
+            counter.increment();
+            console.log(counter.getValue());
+        })
     </script>
 </body>
 </html>

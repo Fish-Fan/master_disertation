@@ -1,24 +1,36 @@
 from flask import Flask
 from flask import request
 from flask import jsonify
+from flask import session
+from flask import render_template
+from bluprints.login_blueprint import login_page
 from os import listdir
+from flask_socketio import SocketIO
+from flask_socketio import emit
+from profiling import profiling_util
 import os.path
 import json
+
 
 import fbp
 
 from fbp.port import Port
 
-app = Flask(__name__, static_url_path="")
+app = Flask(__name__, static_url_path="", template_folder='static')
+app.secret_key = 'fanyank_app'
+app.register_blueprint(login_page)
 app.debug = True
+socketio = SocketIO(app)
 
 global scope
 scope = {}
+PATH = './dataset/'
 
 @app.route("/")
 def index():
-    return app.send_static_file("index.html")
-
+    if not session.get('username'):
+        return app.send_static_file("login.html")
+    return render_template('index.html')
 
 @app.route("/nodestree", methods=['GET'])
 def nodestree():
@@ -130,23 +142,6 @@ def flows():
         result = [v for k, v in flows.items()]
         return jsonify(result)
 
-@app.route("/dataset", methods=['GET', 'POST'])
-def getDataset():
-    path = './dataset'
-    filenames = [f for f in listdir(path) if os.path.isfile(os.path.join(path, f))]
-    print(filenames)
-    return jsonify(filenames)
-
-@app.route("/post_files", methods=["POST"])
-def receiveDataset():
-    request_dict = request.json
-    filenames = request_dict.get('filenames')
-    with open('resoures/text/task2.json') as f:
-        result = json.load(f)
-    return jsonify(result)
-
-
-
 @app.route("/flows/<id>", methods=['GET'])
 def get_flow(id):
     repository = fbp.repository()
@@ -186,9 +181,43 @@ def get_supported_port_types():
     return jsonify(types=Port.support_types())
 
 
+# get data set names from local folders
+@app.route("/dataset", methods=['GET', 'POST'])
+def getDataset():
+    filenames = [f for f in listdir(PATH) if os.path.isfile(os.path.join(PATH, f))]
+    print(filenames)
+    return jsonify(filenames)
 
+# receive user picked filename
+@socketio.on("post_files")
+def receiveDataset(json):
+    filenames = json.get('filenames')[0]
+    pf = profiling_util.profiling_util(PATH + filenames)
+    columns = pf.getColumns()
+    emit('columns', columns)
+    # with open('resoures/text/task2.json') as f:
+    #     result = json.load(f)
+    # return jsonify(result)
+
+# receive user picked datetime column name
+@socketio.on('post_datetime_column')
+def receiveDateTimeColumn(json):
+    datetimeColumn = json.get('datetimeColumn')[0]
+    print(datetimeColumn)
+
+@socketio.event
+def handle_my_event(json):
+    print('receive socket message ' + str(json))
+    pf = profiling_util.profiling_util(PATH + 'qqq.csv')
+    columns = pf.getColumns()
+    emit('myemit', columns)
+    return "emit response from flask"
+
+@socketio.on('myemit')
+def handle_message(data):
+    print('receive message ' + str(data))
 
 
 if __name__ == "__main__":
-
-    app.run(host="0.0.0.0", threaded=True)
+    socketio.run(app)
+    # app.run(host="0.0.0.0", threaded=True)
