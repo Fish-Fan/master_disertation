@@ -26,11 +26,11 @@ global scope
 scope = {}
 PATH = './dataset/'
 
-@app.route("/")
+@app.route("/", methods=['GET'])
 def index():
     if not session.get('username'):
         return app.send_static_file("login.html")
-    return render_template('index.html')
+    return render_template('index.html', name=session.get('username'))
 
 @app.route("/nodestree", methods=['GET'])
 def nodestree():

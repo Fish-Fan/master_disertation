@@ -14,7 +14,7 @@
     <!--<link href="node_modules/x-editable/dist/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet">-->
     <!--<link href="node_modules/codemirror/lib/codemirror.css" rel="stylesheet">-->
     <!--<link href="node_modules/codemirror/theme/icecoder.css" rel="stylesheet">-->
-
+    <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
     <link href="node_modules/x-editable/dist/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet">
     <link href="node_modules/codemirror/lib/codemirror.css" rel="stylesheet">
@@ -50,7 +50,16 @@
             <li><a href="#" id="menuNode">node</a></li>
           </ul>
 
-
+          {% if name %}
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ name }} <span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                    <li><a href='/logout'>Log out</a></li>
+                  </ul>
+                </li>
+            </ul>
+          {% endif %}
 
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->

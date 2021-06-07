@@ -45,7 +45,7 @@
                                     <!-- Button -->
 
                                     <div class="col-sm-12 controls">
-                                      <a id="btn-login" href="#" class="btn btn-success">Login  </a>
+                                      <a id="btn-login" href="#" class="btn btn-success" type="submit">Login  </a>
                                       <a id="btn-fblogin" href="#" class="btn btn-primary">Login with Facebook</a>
 
                                     </div>
@@ -153,7 +153,7 @@
         $(function() {
             $('#btn-login').on('click', function() {
                $.post('login', $( "#loginform" ).serialize(), function(response) {
-                    console.log(response)
+                    document.location.href='/'
                })
             });
         })
