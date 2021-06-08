@@ -398,11 +398,13 @@ define(["model/flow", "util", 'socket'], function(Flow, Util, Socket) {
                 d3.selectAll('input[name="'+ id +'_'+ type +'"]:checked').each(function(d,i) {
                      array.push(d3.select(this).attr('value'))
                 });
+                debugger;
                 post_data = {'filenames': array};
                 Socket.post_files(post_data);
             });
         });
     };
+
     // pop modal to choose datetime column
     Socket.on('columns', (response) => {
         var id = 'dateTimeModal', type = 'radio';
@@ -415,6 +417,7 @@ define(["model/flow", "util", 'socket'], function(Flow, Util, Socket) {
             Socket.post_datetime_column(post_data);
         });
     });
+
 
     // socket.emit('post_files',post_data, (response) => {
     //     console.log(response)

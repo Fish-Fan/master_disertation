@@ -12,6 +12,7 @@
         <label for="input1">D<input type="radio" name="input1"></label>
     </ul>
     <script type="text/javascript" src="node_modules/d3/build/d3.min.js"></script>
+    <script type="text/javascript" src="node_modules/socketio/socket.io.js" crossorigin="anonymous"></script>
     <script type="text/javascript" src="./node_modules/requirejs/require.js"></script>
     <script>
         require(['js/playground/counter'], function(counter) {
@@ -19,6 +20,13 @@
             counter.increment();
             console.log(counter.getValue());
         })
+    </script>
+
+    <script type="text/javascript" charset="utf-8">
+        var socket = io();
+        socket.on('connect', function() {
+            socket.emit('my event', {data: 'I\'m connected!'});
+        });
     </script>
 </body>
 </html>
