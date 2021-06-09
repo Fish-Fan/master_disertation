@@ -22,7 +22,6 @@ define([], function () {
     // });
     var Socket = io();
     Socket.post_files = (data) => {
-        debugger;
         Socket.emit('post_files', data, (response) => {
             console.log(response)
         })

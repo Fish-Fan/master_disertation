@@ -14,14 +14,14 @@
     <!--<link href="node_modules/x-editable/dist/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet">-->
     <!--<link href="node_modules/codemirror/lib/codemirror.css" rel="stylesheet">-->
     <!--<link href="node_modules/codemirror/theme/icecoder.css" rel="stylesheet">-->
-    <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
-    <link href="node_modules/x-editable/dist/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet">
-    <link href="node_modules/codemirror/lib/codemirror.css" rel="stylesheet">
-    <link href="node_modules/codemirror/theme/icecoder.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap-theme.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='node_modules/x-editable/dist/bootstrap3-editable/css/bootstrap-editable.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='node_modules/codemirror/lib/codemirror.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='node_modules/codemirror/theme/icecoder.css') }}" rel="stylesheet">
 
 
-    <link href="css/pyflow.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/pyflow.css') }}" rel="stylesheet">
     <style>
       body {
         padding-top: 0px; /* 60px to make the container go all the way to the bottom of the topbar */
@@ -35,7 +35,7 @@
   </head>
 
   <body>
-
+    <img src="{{ url_for('static', filename='img/animated-progress.gif') }}" alt="" style="display: none" id="imgPath">
     <nav class="navbar navbar-default">
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -71,23 +71,22 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="node_modules/x-editable/dist/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
-    <script type="text/javascript" src="node_modules/codemirror/lib/codemirror.js"></script>
-    <script type="text/javascript" src="node_modules/codemirror/mode/python/python.js"></script>
-    <script type="text/javascript" src="node_modules/js-beautify/js/lib/beautify.js"></script>
-    <script type="text/javascript" src="node_modules/d3/build/d3.min.js"></script>
-    <script type="text/javascript" src="node_modules/jsplumb/dist/js/jsplumb.min.js"></script>
-    <script type="text/javascript" src="node_modules/socketio/socket.io.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='node_modules/x-editable/dist/bootstrap3-editable/js/bootstrap-editable.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='node_modules/codemirror/lib/codemirror.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='node_modules/codemirror/mode/python/python.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='node_modules/js-beautify/js/lib/beautify.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='node_modules/d3/build/d3.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='node_modules/jsplumb/dist/js/jsplumb.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='node_modules/socketio/socket.io.js') }}" crossorigin="anonymous"></script>
     <script type="text/javascript" charset="utf-8">
       var socket = io();
       socket.on('connect', function() {
-          debugger;
           socket.emit('myemit', {data: 'I\'m connected!'});
       });
     </script>
-    <script type="text/javascript" src="node_modules/requirejs/require.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='node_modules/requirejs/require.js') }}"></script>
     <script>
       requirejs.config({
           shim: {
@@ -95,14 +94,14 @@
               exports: io
             }
           },
-          baseUrl: 'js',
+          baseUrl: '../static/js',
           paths: {
-            comp: './components',
-            model: './model',
+            comp: 'components',
+            model: 'model',
             socketio: '../node_modules/socketio/socket.io'
           }
       });
     </script>
-    <script src="js/app.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
   </body>
 </html>

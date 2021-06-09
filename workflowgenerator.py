@@ -1,10 +1,8 @@
-import json
-import time
+from app.fbp import Node
+from app.fbp import Flow
+from app.fbp import repository
 
-from fbp import Node
-from fbp import Flow
-from fbp import repository
-from fbp import port
+
 def create_node(spec_id, id, name, scope):
     spec = repository().get("nodespec", spec_id)
 

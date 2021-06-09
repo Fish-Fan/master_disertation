@@ -1,7 +1,7 @@
 """Flow library"""
 import json
 import time
-
+import os
 from .node import Node
 from .flow import Flow
 from .repository import repository
@@ -62,8 +62,14 @@ def _run_flow(flow_spec,scope):
         print('-'*20)
         print(node_def)
         print('-'*20)
+        if node_def.get('name') in ['read']:
+            PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../dataset/')
+            scope = {'PATH': PATH}
+        elif node_def.get('name') in ['line_plot', 'bar_plot']:
+            PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../plot/')
+            scope = {'PATH': PATH}
         anode = create_node(node_def.get("spec_id"),
-                            node_def.get("id"), node_def.get("name"),scope)
+                                node_def.get("id"), node_def.get("name"), scope)
 
         aflow.add_node(anode)
 

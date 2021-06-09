@@ -398,7 +398,6 @@ define(["model/flow", "util", 'socket'], function(Flow, Util, Socket) {
                 d3.selectAll('input[name="'+ id +'_'+ type +'"]:checked').each(function(d,i) {
                      array.push(d3.select(this).attr('value'))
                 });
-                debugger;
                 post_data = {'filenames': array};
                 Socket.post_files(post_data);
             });

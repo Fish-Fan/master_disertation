@@ -134,8 +134,10 @@ define(["util"], function(Util) {
         row_action.append("th").text("Action");
         var action_content = row_action.append("td");
         action_content.append("button").datum({ id: node.nodeId }).text("Run").classed("btn btn-xs btn-primary", true)
-            .on("click", function(d) { 
-                var progressBar = action_content.append('img').attr("src", "img/animated-progress.gif")
+            .on("click", function(d) {
+                var imgPath = $('#imgPath').attr('src');
+                debugger;
+                var progressBar = action_content.append('img').attr("src", imgPath)
                     .attr("height", "30").attr("width", "30");
 
                 function handleFlowRunResult(data) {
