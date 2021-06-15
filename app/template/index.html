@@ -19,7 +19,7 @@
     <link href="{{ url_for('static', filename='node_modules/x-editable/dist/bootstrap3-editable/css/bootstrap-editable.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='node_modules/codemirror/lib/codemirror.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='node_modules/codemirror/theme/icecoder.css') }}" rel="stylesheet">
-
+    <link href="{{ url_for('static', filename='css/inquery/main.css') }}" rel="stylesheet">
 
     <link href="{{ url_for('static', filename='css/pyflow.css') }}" rel="stylesheet">
     <style>
@@ -68,6 +68,97 @@
     <div class="container-fluid" id="mainUI">
     </div> <!-- /container -->
 
+    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel" id="inquery-modal">
+      <div class="modal-dialog modal-lg" role="document" style="width: 90%; max-height: 90%;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="gridSystemModalLabel">Modal title</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-4" style="overflow-y: scroll; height: 750px">
+                  <form action="">
+                      <button class="btn btn-primary" @click="profiling()">profiling</button>
+                      <div class="form-group">
+                          <label>choose your datetime column: </label>
+                          <div class="radio" v-for="column in columns">
+                              <label>
+                                  <input type="radio" value="column" name="datetime-column">
+                                  ${column}
+                              </label>
+                            </div>
+                      </div>
+                      <div class="form-group">
+                          <label>pick date or time: </label>
+                          <div class="checkbox">
+                              <label>
+                                  <input type="checkbox" value="date" name="datetime">
+                                  date
+                              </label>
+                          </div>
+                          <div class="checkbox">
+                              <label>
+                                  <input type="checkbox" value="time" name="datetime">
+                                  time
+                              </label>
+                          </div>
+                      </div>
+                      <div class="form-group">
+                          <label>suggestions for removing constant variable:</label>
+                          <div class="checkbox" v-for="column in constantColumns">
+                              <label>
+                                  <input type="checkbox" value="column" name="remove-column">
+                                  ${column}
+                              </label>
+                          </div>
+                      </div>
+                      <div class="form-group">
+                          <label>suggestions for removing high correlation varible: </label>
+                          <div class="checkbox" v-for="group in highCorrelationColumns">
+                              <label>Group ${group.index}</label>
+                              <div class="checkbox" v-for="column in group.columns">
+                                  <label>
+                                      <input type="checkbox" value="column" name="remove-column">
+                                      ${column}
+                                  </label>
+                            </div>
+                          </div>
+                      </div>
+                      <div class="form-group">
+                          <label>suggestions for removing columns that contain too many zeros: </label>
+                          <div class="checkbox" v-for="column in manyZerosColumns">
+                              <label>
+                                  <input type="checkbox" value="column" name="remove-column">
+                                  ${column}
+                              </label>
+                          </div>
+                      </div>
+                      <div class="form-group">
+                          <label>suggestions for removing columns that is blank: </label>
+                          <div class="checkbox" v-for="column in blankColumns">
+                              <label>
+                                  <input type="checkbox" value="column" name="remove-column">
+                                  ${column}
+                              </label>
+                          </div>
+                      </div>
+                  </form>
+              </div>
+              <div class="col-md-8" id="pandas-profiling-result">
+                  <iframe src="{{ url_for('static', filename='report_html/report.html') }}" frameborder="0" style="position: relative; height: 750px; width: 100%;"></iframe>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -103,5 +194,7 @@
       });
     </script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="{{ url_for('static', filename='js/inquery/app.js') }}"></script>
   </body>
 </html>

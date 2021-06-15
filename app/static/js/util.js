@@ -50,7 +50,7 @@ define([], function() {
         });
 
         d3.select("#" + container_id).append("ul").selectAll("li").data(dataset).enter().append("li").append("div").attr('class','checkbox checkbox-primary').html(function(d) {
-            return "<input name="+ inputname + " type="+ type +" value='"+ d +"'/><label for='"+ inputname +"'>"+ d +"</label>"
+            return "<label><input name="+ inputname + " type="+ type +" value='"+ d +"'/>"+ d +"</label>"
         });
 
         $("#" + modal_id).modal("show");

@@ -2,8 +2,9 @@ from .. import socketio
 from app.profiling import profiling_util
 from flask_socketio import emit
 import os
+from .. import dataset_location
 
-PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../dataset/')
+PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), dataset_location)
 
 # receive user picked filename
 @socketio.on("post_files")

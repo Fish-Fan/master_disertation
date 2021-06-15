@@ -118,6 +118,8 @@ define(["model/flow", "util", 'socket'], function(Flow, Util, Socket) {
             me._showEducation();
         });
 
+        this._heading.append("button").classed("glyphicon glyphicon-user flowbutton", true).attr('type', 'button').attr('data-toggle', 'modal').attr('data-target', '#mymodal');
+
         this._heading.append("button").classed("glyphicon glyphicon-remove-circle flowbutton", true).on("click", function() {
             me._removeNode();
         }).style("visibility", "hidden");
@@ -407,14 +409,17 @@ define(["model/flow", "util", 'socket'], function(Flow, Util, Socket) {
     // pop modal to choose datetime column
     Socket.on('columns', (response) => {
         var id = 'dateTimeModal', type = 'radio';
-        Util.generateModalwithInput(id, 'Choose your datetime column', response, type, () => {
-            var array = [];
-            d3.selectAll('input[name="'+ id +'_'+ type +'"]:checked').each(function (d, i) {
-                    array.push(d3.select(this).attr('value'))
-                });
-            post_data = {'datetimeColumn': array};
-            Socket.post_datetime_column(post_data);
-        });
+        // Util.generateModalwithInput(id, 'Choose your datetime column', response, type, () => {
+        //     var array = [];
+        //     d3.selectAll('input[name="'+ id +'_'+ type +'"]:checked').each(function (d, i) {
+        //             array.push(d3.select(this).attr('value'))
+        //         });
+        //     post_data = {'datetimeColumn': array};
+        //     Socket.post_datetime_column(post_data);
+        // });
+        $('#inquery-modal').modal();
+        // $('#pandas-profiling-result').html(response);
+        // console.log(response)
     });
 
 
