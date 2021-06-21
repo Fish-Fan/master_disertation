@@ -10,7 +10,7 @@ scope = {}
 @origin.route("/", methods=['GET'])
 def index():
     if not session.get('username'):
-        return origin.send_static_file("login.html")
+        return render_template("login.html")
     return render_template('index.html', name=session.get('username'))
 
 @origin.route("/nodestree", methods=['GET'])

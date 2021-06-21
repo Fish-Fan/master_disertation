@@ -86,10 +86,12 @@ define(["model/flow", "util", 'socket'], function(Flow, Util, Socket) {
     Canvas.prototype.render = function() {
         this._clear();
         var root = d3.select("#" + this._rootId);
+        var footer = d3.select('#inquery-form-footer');
         this._panel = Util.addPanel(root, "Flow");
         var me = this;
 
         this._heading = root.select(".panel-heading");
+
         this._titleSpan = this._heading.append("span").classed("label label-primary", true).style("margin-left", "5px");
         this._titleSpan.text(this._currentFlow.flow().name);
         this._heading.append("br");
@@ -116,6 +118,10 @@ define(["model/flow", "util", 'socket'], function(Flow, Util, Socket) {
 
         this._heading.append("button").classed("glyphicon glyphicon-education flowbutton", true).on("click", function() {
             me._showEducation();
+        });
+
+        footer.append("button").classed('btn btn-primary', true).text('Save Changes').attr('id', 'inquery-submit-btn').on("click", function() {
+            me._submitInqueryForm();
         });
 
         this._heading.append("button").classed("glyphicon glyphicon-user flowbutton", true).attr('type', 'button').attr('data-toggle', 'modal').attr('data-target', '#mymodal');
@@ -403,6 +409,48 @@ define(["model/flow", "util", 'socket'], function(Flow, Util, Socket) {
                 post_data = {'filenames': array};
                 Socket.post_files(post_data);
             });
+        });
+    };
+
+    Canvas.prototype._submitInqueryForm = function() {
+        var me = this;
+        var date_column_value = $('input[name="datetime-column"]').val();
+        var date_time_array = new Set();
+        var remove_column_n = $('input[name="datetime"]:checked').length;
+        if (remove_column_n) {
+            $('input[name="datetime"]:checked').each(function () {
+                date_time_array.add($(this).val());
+            })
+
+        }
+        var remove_column_array = new Set();
+        var remove_column_n = $("input[name='remove-column']:checked").length;
+        if (remove_column_n > 0){
+            $("input[name='remove-column']:checked").each(function(){
+                remove_column_array.add($(this).val());
+            });
+        }
+
+        date_time_array = [...date_time_array];
+        remove_column_array = [...remove_column_array];
+
+        post_data = {
+            "removeColumns": remove_column_array,
+            "dateTime": date_time_array,
+            "dateTimeColumn": date_column_value
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/generateworkflow",
+            contentType: 'application/json',
+            data: JSON.stringify(post_data),
+            dataType: 'json',
+            success: function (data) {
+                debugger;
+                me._loadflow(data);
+                $('#inquery-modal').modal('hide');
+            }
         });
     };
 

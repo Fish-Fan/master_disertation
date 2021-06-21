@@ -4,6 +4,7 @@ from flask_socketio import SocketIO
 
 socketio = SocketIO()
 dataset_location = '../dataset/'
+report_html_location = '../static/report_html/'
 
 def create_app():
     # create an application
@@ -19,5 +20,6 @@ def create_app():
     app.register_blueprint(loginBlueprint)
     app.register_blueprint(originBlueprint)
     app.config['dataset_location'] = dataset_location
+    app.config['report_html_location'] = report_html_location
     socketio.init_app(app)
     return app

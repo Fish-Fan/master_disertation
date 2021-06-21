@@ -1,4 +1,11 @@
 import pandas as pd
+from pandas_profiling import ProfileReport
+import os
+from .. import report_html_location
+from datetime import datetime
+
+REPORT_HTML_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), report_html_location)
+
 class profiling_util:
     def __init__(self, source):
         self.source = source
@@ -7,6 +14,12 @@ class profiling_util:
         dataset = pd.read_csv(self.source)
         return list(dataset.columns)
 
+    def generateHtmlReport(self):
+        df = pd.read_csv(self.source)
+        pf = ProfileReport(df, config_file=REPORT_HTML_PATH + 'report_config.yml')
+        file_name = 'report_' + datetime.now().strftime('%Y%m%d%H%M%s') + '.html'
+        pf.to_file(REPORT_HTML_PATH + file_name)
+        return file_name
 
     def getinfo(self):
         dataset = pd.read_csv(self.source)
@@ -15,7 +28,18 @@ class profiling_util:
         ans['constant'] = self._getConstantColumns_(dataset)
         ans['missing'] = self._getMissingValueColumns_(dataset)
         ans['zero'] = self._getZeroValuesColumns_(dataset)
+        ans['columns'] = self._getColumns_(dataset)
         return ans
+
+    def _getColumns_(self, data):
+        columns = []
+        index = 0
+        for column in list(data.columns):
+            t = {}
+            t['index'] = index
+            t['name'] = column
+            columns.append(t)
+        return columns
 
     def _getCorrectionColumns_(self, data):
         ans = {}
