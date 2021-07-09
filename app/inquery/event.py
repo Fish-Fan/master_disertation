@@ -3,6 +3,7 @@ from app.profiling import profiling_util
 from flask_socketio import emit
 import os
 from .. import dataset_location
+from flask import session
 
 PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), dataset_location)
 
@@ -11,6 +12,8 @@ PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), dataset_location
 def receiveDataset(json):
     filenames = json.get('filenames')[0]
     pf = profiling_util.profiling_util(PATH + filenames)
+    session['filenames'] = filenames
+    session.modified = True
     columns = pf.getColumns()
     emit('columns', columns)
     # with open('resoures/text/task2.json') as f:

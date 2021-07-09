@@ -11,6 +11,7 @@ def toLoginPage():
 def postLoginForm():
     username = request.form['username']
     session['username'] = username
+    session.modified = True
     return redirect(url_for('origin.index'))
 
 @login.route('/logout', methods=['GET'])

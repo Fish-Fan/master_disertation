@@ -1,17 +1,15 @@
-const app = Vue.createApp({
-    data () {
-        return {
-            columns: [],
-            constantColumns: [],
-            highCorrelationColumns: [],
-            manyZerosColumns: [],
-            blankColumns: [],
-            reportPath: '/static/report_html/demo.html',
-            removeColumns: [],
-            dateTime: [],
-            dateTimeColumn: '',
-            filename: 'qqq.csv'
-        }
+new window.Vue({
+    el: '#inquery-modal',
+    data: {
+        filename: 'new_uk_500.csv',
+        deleteColumns: [],
+        fillMissingColumns: [],
+        splitColumns: [],
+        changeTypeColumns: [],
+        submitDeleteColumns: [],
+        submitFillMissingColumns: [],
+        submitSplitColumns: [],
+        submitChangeTypeColumns: []
     },
     methods: {
         async profiling(e) {
@@ -23,12 +21,10 @@ const app = Vue.createApp({
             };
             const res = await fetch('http://127.0.0.1:5000/profiling', requestOptions);
             result = await res.json();
-            this.columns = result.columns;
-            this.constantColumns = result.constant;
-            this.highCorrelationColumns = result.correlation;
-            this.manyZerosColumns = result.zero;
-            this.blankColumns = result.missing;
-            this.reportPath = '/static/report_html/' + result.reportName;
+            this.deleteColumns = result.delete_column_pre;
+            this.fillMissingColumns = result.fill_missing_value_pre;
+            this.splitColumns = result.split_column_pre;
+            this.changeTypeColumns = result.change_column_pre;
         },
         async submitForm(e) {
             e.preventDefault();
@@ -44,12 +40,16 @@ const app = Vue.createApp({
             };
             const res = await fetch('http://127.0.0.1:5000/generateworkflow', requestOptions);
             result = await res.json();
+        },
+        demoFun (message, e) {
+            e.preventDefault()
+            console.log(message)
         }
     },
-    compilerOptions: {
-     delimiters: ['${', '}'],
-        comments: true
-    }
-});
+    components: {
+        'display-table': window.httpVueLoader("/static/js/components/displayTable.vue"),
+        'checkbox-btn-group': window.httpVueLoader("/static/js/components/checkboxButton.vue")
+    },
+    delimiters: ["${","}"]
 
-app.mount('#inquery-modal');
+})

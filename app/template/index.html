@@ -80,73 +80,62 @@
               <div class="col-md-4" style="overflow-y: scroll; height: 750px">
                   <form action="/generateworkflow" id="inquery-form">
                       <button class="btn btn-primary" @click="profiling">profiling</button>
+
                       <div class="form-group">
-                          <label>choose your datetime column: </label>
-                          <div class="radio" v-for="column in columns">
-                              <label>
-                                  <input type="radio" :value="column.index" name="datetime-column" v-model="dateTimeColumn">
-                                  ${column.name}
-                              </label>
-                            </div>
+                          <label>suggestions for deleting columns:</label>
+                          <checkbox-btn-group :column_list="deleteColumns"></checkbox-btn-group>
+                      </div>
+
+                      <div class="form-group">
+                          <label>suggestions for fill missing value columns: </label>
+                          <checkbox-btn-group :column_list="fillMissingColumns"></checkbox-btn-group>
+                      </div>
+
+                      <div class="form-group">
+                          <label>suggestions for splitting columns: </label>
+                          <checkbox-btn-group :column_list="splitColumns"></checkbox-btn-group>
                       </div>
                       <div class="form-group">
-                          <label>pick date or time: </label>
-                          <div class="checkbox">
-                              <label>
-                                  <input type="checkbox" value="date" name="datetime" v-model="dateTime">
-                                  date
-                              </label>
-                          </div>
-                          <div class="checkbox">
-                              <label>
-                                  <input type="checkbox" value="time" name="datetime" v-model="dateTime">
-                                  time
-                              </label>
-                          </div>
-                      </div>
-                      <div class="form-group">
-                          <label>suggestions for removing constant variable:</label>
-                          <div class="checkbox" v-for="column in constantColumns">
-                              <label>
-                                  <input type="checkbox" :value="column" name="remove-column" v-model="removeColumns">
-                                  ${column}
-                              </label>
-                          </div>
-                      </div>
-                      <div class="form-group">
-                          <label>suggestions for removing high correlation varible: </label>
-                          <div class="checkbox" v-for="group in highCorrelationColumns">
-                              <label>Group ${group.index}</label>
-                              <div class="checkbox" v-for="column in group.columns">
-                                  <label>
-                                      <input type="checkbox" :value="column" name="remove-column" v-model="removeColumns">
-                                      ${column}
-                                  </label>
-                            </div>
-                          </div>
-                      </div>
-                      <div class="form-group">
-                          <label>suggestions for removing columns that contain too many zeros: </label>
-                          <div class="checkbox" v-for="column in manyZerosColumns">
-                              <label>
-                                  <input type="checkbox" :value="column" name="remove-column" v-model="removeColumns">
-                                  ${column}
-                              </label>
-                          </div>
-                      </div>
-                      <div class="form-group">
-                          <label>suggestions for removing columns that is blank: </label>
-                          <div class="checkbox" v-for="column in blankColumns">
-                              <label>
-                                  <input type="checkbox" :value="column" name="remove-column" v-model="removeColumns">
-                                  ${column}
-                              </label>
-                          </div>
+                          <label>suggestions for changing column's type: </label>
+                          <checkbox-btn-group :column_list="changeTypeColumns"></checkbox-btn-group>
                       </div>
                   </form>
               </div>
               <div class="col-md-8" id="pandas-profiling-result">
-                  <iframe :src="reportPath" frameborder="0" style="position: relative; height: 750px; width: 100%;"></iframe>
+                  <div class="row">
+                      <div class="col-md-12" style="position: relative; height: 450px; width: 100%;">
+                          <div class="layui-card">
+                              <div class="layui-card-header">demo table</div>
+                              <display-table></display-table>
+                          </div>
+                      </div>
+                      <div class="col-md-12" style="position: relative; height: 300px; width: 100%;">
+                           <div class="layui-card">
+                              <div class="layui-card-header">demo recipe</div>
+                              <div class="layui-card-body" style="position: relative; height: 275px;overflow-y: scroll; padding-right: 5px">
+                                  <form class="layui-form">
+                                      <div class="layui-form-item">
+                                            <div>
+                                              <input type="checkbox" name="like1[write]" lay-skin="primary" title="写作" checked="">
+                                            </div>
+                                      </div>
+                                      <hr>
+                                      <div class="layui-form-item">
+                                            <div>
+                                              <input type="checkbox" name="like1[write]" lay-skin="primary" title="写作" checked="">
+                                            </div>
+                                      </div>
+                                      <hr>
+                                      <div class="layui-form-item">
+                                            <div>
+                                              <input type="checkbox" name="like1[write]" lay-skin="primary" title="写作" checked="">
+                                            </div>
+                                      </div>
+                                  </form>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
               </div>
             </div>
           </div>
@@ -161,6 +150,13 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/http-vue-loader"></script>
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- import JavaScript -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="{{ url_for('static', filename='js/inquery/app.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='node_modules/x-editable/dist/bootstrap3-editable/js/bootstrap-editable.min.js') }}"></script>
@@ -193,7 +189,7 @@
       });
     </script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-    <script src="https://unpkg.com/vue@next"></script>
-    <script src="{{ url_for('static', filename='js/inquery/app.js') }}"></script>
+
+
   </body>
 </html>

@@ -1,0 +1,190 @@
+{
+  "delete_column_pre": [
+    {
+      "column": "web",
+      "data": null,
+      "score": 0.58,
+      "index": 6
+    },
+    {
+      "column": "name",
+      "data": null,
+      "score": 0.334,
+      "index": 0
+    },
+    {
+      "column": "age",
+      "data": null,
+      "score": 0.01,
+      "index": 8
+    }
+  ],
+  "fill_missing_value_pre": [
+    {
+      "column": "web",
+      "data": null,
+      "score": 0.42000000000000004,
+      "index": 6
+    },
+    {
+      "column": "name",
+      "data": null,
+      "score": 0.6659999999999999,
+      "index": 0
+    },
+    {
+      "column": "age",
+      "data": null,
+      "score": 0.99,
+      "index": 8
+    }
+  ],
+  "split_column_pre": [
+    {
+      "column": "name",
+      "data": {
+        "delimiter": " "
+      },
+      "score": 1,
+      "index": 0
+    },
+    {
+      "column": "company_name",
+      "data": {
+        "delimiter": "/"
+      },
+      "score": 0.9992571428571428,
+      "index": 1
+    },
+    {
+      "column": "address",
+      "data": {
+        "delimiter": " "
+      },
+      "score": 0.8649657142857143,
+      "index": 2
+    },
+    {
+      "column": "county",
+      "data": {
+        "delimiter": "-"
+      },
+      "score": 1,
+      "index": 3
+    },
+    {
+      "column": "postal",
+      "data": {
+        "delimiter": " "
+      },
+      "score": 0.581243001119821,
+      "index": 4
+    },
+    {
+      "column": "email",
+      "data": {
+        "delimiter": "@"
+      },
+      "score": 0.7460107844602786,
+      "index": 5
+    },
+    {
+      "column": "web",
+      "data": {
+        "delimiter": "."
+      },
+      "score": 0.8703703703703703,
+      "index": 6
+    },
+    {
+      "column": "phone",
+      "data": {
+        "delimiter": "-"
+      },
+      "score": 0.8793548387096773,
+      "index": 7
+    },
+    {
+      "column": "age",
+      "data": {
+        "delimiter": "-"
+      },
+      "score": 0.9932659932659932,
+      "index": 8
+    }
+  ],
+  "change_column_pre": [
+    {
+      "column": "name",
+      "data": {
+        "type": "string"
+      },
+      "score": 0,
+      "index": 0
+    },
+    {
+      "column": "company_name",
+      "data": {
+        "type": "string"
+      },
+      "score": 0,
+      "index": 1
+    },
+    {
+      "column": "address",
+      "data": {
+        "type": "string"
+      },
+      "score": 0,
+      "index": 2
+    },
+    {
+      "column": "county",
+      "data": {
+        "type": "string"
+      },
+      "score": 0,
+      "index": 3
+    },
+    {
+      "column": "postal",
+      "data": {
+        "type": "postal"
+      },
+      "score": 1,
+      "index": 4
+    },
+    {
+      "column": "email",
+      "data": {
+        "type": "email"
+      },
+      "score": 0.734,
+      "index": 5
+    },
+    {
+      "column": "web",
+      "data": {
+        "type": "string"
+      },
+      "score": 0,
+      "index": 6
+    },
+    {
+      "column": "phone",
+      "data": {
+        "type": "float"
+      },
+      "score": 0.6599999999999999,
+      "index": 7
+    },
+    {
+      "column": "age",
+      "data": {
+        "type": "int"
+      },
+      "score": 0.9939393939393939,
+      "index": 8
+    }
+  ]
+}
