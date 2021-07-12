@@ -3,26 +3,31 @@ from pandas_profiling import ProfileReport
 import os
 from .. import report_html_location
 from datetime import datetime
+import json
 
 REPORT_HTML_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), report_html_location)
 
-class profiling_util:
-    def __init__(self, source):
+class Profiling_util:
+    def __init__(self, source, data_frame=None):
         self.source = source
+        if data_frame:
+            self.df = pd.DataFrame(data_frame)
+        else:
+            self.df = pd.read_csv(self.source)
 
     def getColumns(self):
-        dataset = pd.read_csv(self.source)
+        dataset = self.df.copy()
         return list(dataset.columns)
 
     def generateHtmlReport(self):
-        df = pd.read_csv(self.source)
+        df = self.df.copy()
         pf = ProfileReport(df, config_file=REPORT_HTML_PATH + 'report_config.yml')
         file_name = 'report_' + datetime.now().strftime('%Y%m%d%H%M%s') + '.html'
         pf.to_file(REPORT_HTML_PATH + file_name)
         return file_name
 
     def getinfo(self):
-        dataset = pd.read_csv(self.source)
+        dataset = self.df.copy()
         ans = {}
         ans['correlation'] = self._getCorrectionColumns_(dataset)
         ans['constant'] = self._getConstantColumns_(dataset)
@@ -83,3 +88,10 @@ class profiling_util:
         res = res.round(2)
         res = res.sort_values(ascending=False)
         return list(res.index)
+
+    def getColumnProfiling(self, columnName):
+        df = self.df.copy()
+        profile = ProfileReport(df, config_file=REPORT_HTML_PATH + 'report_config.yml')
+        parsedJson = json.loads(profile.json)
+        ans = parsedJson['variables'][columnName]
+        return ans

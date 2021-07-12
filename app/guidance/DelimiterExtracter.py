@@ -4,7 +4,7 @@ import re
 from collections import OrderedDict
 from difflib import SequenceMatcher
 
-class DelimiterExtract:
+class DelimiterExtracter:
     def __init__(self, strList):
         self.strList = strList
 
@@ -118,6 +118,6 @@ if __name__ == '__main__':
                     "2020/01/02"]
 
 
-    de = DelimiterExtract(date_samples)
+    de = DelimiterExtracter(date_samples)
     delimiterSet = de.extractDelimiter()
     print(delimiterSet)

@@ -1,50 +1,28 @@
 <template>
-  <el-table
-    :data="tableData"
-    style="width: 100%"
-    height="450"
-    border
-    size="mini">
-    <el-table-column
-      prop="name"
-      label="name"
-      width="180">
-    </el-table-column>
-    <el-table-column
-      prop="company_name"
-      label="company_name"
-      width="180">
-    </el-table-column>
-    <el-table-column
-      prop="address"
-      label="address">
-    </el-table-column>
-      <el-table-column
-      prop="county"
-      label="county">
-    </el-table-column>
-      <el-table-column
-      prop="postal"
-      label="postal">
-    </el-table-column>
-      <el-table-column
-      prop="email"
-      label="email">
-    </el-table-column>
-      <el-table-column
-      prop="web"
-      label="web">
-    </el-table-column>
-      <el-table-column
-      prop="phone"
-      label="phone">
-    </el-table-column>
-      <el-table-column
-      prop="age"
-      label="age">
-    </el-table-column>
+  <el-tabs value="View">
+    <el-tab-pane label="Data Preview" name="View">
+      <el-table
+        :key="tableKey"
+        :data="tableData"
+        :cell-class-name="cellClassNameFunc"
+        style="width: 100%"
+        height="450"
+        border
+        v-loading="isLoad"
+        size="mini">
+          <el-table-column
+              v-for="item in headers"
+              :prop="item.prop"
+              :label="item.label"
+              :index="item.index"
+              width="180">
+          </el-table-column>
 
-  </el-table>
+      </el-table>
+    </el-tab-pane>
+  </el-tabs>
+
+
 </template>
 
 <style>
@@ -60,25 +38,38 @@
 
 <script>
     module.exports = {
+        props: ['highlight_columns', 'preview_dataset'],
         devServer: {
             proxy: 'http://127.0.0.1:5000/'
         },
         async mounted() {
-            const requestOptions = {
-                method: "POST",
-                headers: { 'Accept': 'application/json', "Content-Type": "application/json"},
-                body: JSON.stringify({ filename: this.filename })
-            };
-            const res = await fetch('/demodataset', requestOptions);
-            result = await res.json();
-            this.tableData = result.tableData;
+            this.$http.get('/demodataset').then(response => {
+               this.tableData = response.body.tableData;
+               this.headers = response.body.headers;
+            })
         },
         methods: {
-
+          cellClassNameFunc({row, column, rowIndex, columnIndex}) {
+            if (columnIndex == this.highlight_columns) {
+              return 'warning-row'
+            }
+          }
+        },
+        watch: {
+          highlight_columns: function(newVal, oldVal) {
+            this.tableKey++
+          },
+          preview_dataset: function(newVal, oldVal) {
+            this.tableData = newVal['tableData']
+            this.headers = newVal['headers']
+          }
         },
         data() {
             return {
-                tableData: []
+                tableKey: 1,
+                isLoad: false,
+                tableData: [],
+                headers: []
             }
         }
     }

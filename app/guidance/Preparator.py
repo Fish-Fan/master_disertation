@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 import re
-from app.guidance import DelimiterExtracter
+from app.guidance.DelimiterExtracter import DelimiterExtracter
+from app.util.ColumnUtil import ColumnUtil
 from collections import defaultdict, OrderedDict
 import jsons
 
@@ -9,12 +10,20 @@ class Preparator:
     def __init__(self, name, dataframe):
         self.dataframe = dataframe
         self.name = name
+        self.columnIndexMap = {}
+        for index, col in enumerate(list(self.dataframe.columns)):
+            self.columnIndexMap[col] = index
 
 class MarkingResult:
-    def  __init__(self, score, column, data):
+    def  __init__(self, score, column, index, data):
         self.score = score
         self.column = column
         self.data = data
+        self.index = index
+
+class ListColumnPreparator(Preparator):
+    def getColumnList(self):
+        return self.columnIndexMap
 
 class DeleteColumnPreparator(Preparator):
     def marking(self):
@@ -27,7 +36,7 @@ class DeleteColumnPreparator(Preparator):
         d = res.to_dict()
         markResList = []
         for key, value in d.items():
-            markResList.append(MarkingResult(value, key, None))
+            markResList.append(MarkingResult(value, key, self.columnIndexMap.get(key),None))
         return markResList
 
 class FillMissingValuePreparator(Preparator):
@@ -41,8 +50,20 @@ class FillMissingValuePreparator(Preparator):
 
         d = res.to_dict()
         markResList = []
-        for key, value in d.items():
-            markResList.append(MarkingResult(value, key, None))
+
+        for column, score in d.items():
+            column_util = ColumnUtil(df[column])
+            column_type= column_util.guessColumnType()
+            data = {}
+            if column_type.get('type') in ['int', 'float']:
+                data['fillWay'] = 'calculating'
+                data['fillMethod'] = 'mean'
+                data['fillValue'] = round(pd.Series(column_type.get('matchValues'), dtype=np.dtype(column_type.get('type'))).mean(), 2)
+            else:
+                data['fillWay'] = 'calculating'
+                data['fillMethod'] = 'frequency'
+                data['fillValue'] = column_util.getMostFrequency()
+            markResList.append(MarkingResult(score, column, self.columnIndexMap.get(column), data))
         return markResList
 
 class SplitColumnPreparator(Preparator):
@@ -53,10 +74,10 @@ class SplitColumnPreparator(Preparator):
         markResList = []
         for column in columns:
             arr = list(df[column].dropna())
-            de = DelimiterExtracter.DelimiterExtract(arr)
+            de = DelimiterExtracter(arr)
             delimiter = de.extractBestDelimiter()
 
-            markRes = MarkingResult(delimiter['score'], column, {'delimiter': delimiter['delimiter']})
+            markRes = MarkingResult(delimiter['score'], column, self.columnIndexMap.get(column),{'delimiter': delimiter['delimiter']})
             markResList.append(markRes)
         return markResList
 
@@ -68,6 +89,7 @@ class SplitColumnPreparator(Preparator):
         x = re.sub(r'[a-zA-Z]+', r'([A-Z)]+)', x)
         x = re.sub(r'[0-9]+', r'([0-9]+)', x)
         return '^' + x + '$'
+
 
 
 class ChangeColumnTypePreparator(Preparator):
@@ -102,7 +124,7 @@ class ChangeColumnTypePreparator(Preparator):
                 else:
                     res['score'] = 0.0
                 break
-            markRes = MarkingResult(res['score'], column, {'type': res['type']})
+            markRes = MarkingResult(res['score'], column, self.columnIndexMap.get(column), {'type': res['type']})
             markResList.append(markRes)
         return markResList
 

@@ -5,8 +5,11 @@ from . import inquery
 from .. import dataset_location
 from .. import report_html_location
 from flask import request, session
-from app.profiling import profiling_util
-from ..util import Workflowgenerator
+from app.profiling.Profiling_util import Profiling_util
+from ..util.WorkflowGenerator import WorkflowGenerator
+from ..util.PreviewUtil import PreviewUtil
+from ..util.DataFrameConverter import DataFrameConverter
+from ..guidance.Guidance import Guidance
 import json
 
 
@@ -22,15 +25,9 @@ def getDataset():
 
 @inquery.route("/profiling", methods=['POST'])
 def doProfiling():
-    # filenames = request.get_json()['filename']
-    # pf = profiling_util.profiling_util(DATASET_PATH + filenames)
-    # res = pf.getinfo()
-    # res['reportName'] = pf.generateHtmlReport()
-    # return jsonify(res)
-    f = open(DATASET_PATH + 'guidance.json')
-    data = json.load(f)
-    f.close()
-    return data
+    filenames = request.get_json()['filename']
+    guidance = Guidance(DATASET_PATH + filenames)
+    return guidance.analysis()
 
 
 @inquery.route('/generateworkflow', methods=['POST'])
@@ -47,13 +44,34 @@ def generateworkflow():
     if 'time' in rawDateTime:
         dateTime['time'] = True
 
-    generator = Workflowgenerator.WorkflowGenerator()
+    generator = WorkflowGenerator()
     workFlowJson = generator.generator(rawRemoveColumns, dateTime, rawDateTimeColumns,rawFileName)
     return workFlowJson
 
 @inquery.route('/demodataset', methods=['GET', 'POST'])
 def getDemodataset():
-    f = open(DATASET_PATH + 'new_uk_500.json')
-    data = json.load(f)
-    f.close()
-    return data
+    filenames = 'new_uk_500.csv'
+    dfc = DataFrameConverter(df=None, source=DATASET_PATH + filenames)
+    return dfc.doConvert()
+
+@inquery.route('/column_profiling', methods=['GET', 'POST'])
+def columnProfiling():
+    column = request.get_json()['column']
+    filenames = 'new_uk_500.csv'
+    pf = None
+    if 'preview_df' in session and session.get('preview_df'):
+        pf = Profiling_util(filenames, data_frame=session.get('preview_df'))
+    else:
+        pf = Profiling_util(DATASET_PATH + filenames)
+    ans = pf.getColumnProfiling(column)
+    return jsonify(ans)
+
+@inquery.route('/preview', methods=['GET', 'POST'])
+def preview():
+    filenames = 'new_uk_500.csv'
+    pu = PreviewUtil(DATASET_PATH + filenames)
+    tmp = pu.getPreviewJson(request.get_json())
+    session['preview_df'] = pu.df.to_dict()
+    return tmp
+
+

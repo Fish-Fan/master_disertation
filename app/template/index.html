@@ -82,58 +82,55 @@
                       <button class="btn btn-primary" @click="profiling">profiling</button>
 
                       <div class="form-group">
+                          <label>profiling for each columns:</label>
+                          <profiling-column
+                                  v-on:column-profiling-result="handleColumnProfilingResult"
+                                  v-on:highlight-columns-changed="handleHighlightColumnsChanged"
+                                  :column_list="columnList"></profiling-column>
+                      </div>
+
+                      <div class="form-group">
                           <label>suggestions for deleting columns:</label>
-                          <checkbox-btn-group :column_list="deleteColumns"></checkbox-btn-group>
+                          <delete-column-group
+                                  v-on:delete-recipe-event="handleRecipeEvent"
+                                  :column_list="deleteColumns"
+                          ></delete-column-group>
                       </div>
 
                       <div class="form-group">
                           <label>suggestions for fill missing value columns: </label>
-                          <checkbox-btn-group :column_list="fillMissingColumns"></checkbox-btn-group>
+                          <filling-missing-value-group
+                                  v-on:fill-missing-value-recipe-event="handleRecipeEvent"
+                                  :column_list="fillMissingColumns"></filling-missing-value-group>
                       </div>
 
                       <div class="form-group">
                           <label>suggestions for splitting columns: </label>
-                          <checkbox-btn-group :column_list="splitColumns"></checkbox-btn-group>
+                          <delete-column-group :column_list="splitColumns"></delete-column-group>
                       </div>
                       <div class="form-group">
                           <label>suggestions for changing column's type: </label>
-                          <checkbox-btn-group :column_list="changeTypeColumns"></checkbox-btn-group>
+                          <delete-column-group :column_list="changeTypeColumns"></delete-column-group>
                       </div>
+                      <preview-and-add-recipe-group
+                              v-on:preview-dataset-changed="handlePreviewDatasetChanged"
+                              :preview_delete_columns="previewDeleteColumns"
+                              :preview_fill_missing_columns="previewFillMissingColumns"
+                              :preview_splitting_columns="previewSplittingColumns"
+                              :preview_change_type_columns="previewChangeTypeColumns"
+                      ></preview-and-add-recipe-group>
                   </form>
               </div>
               <div class="col-md-8" id="pandas-profiling-result">
                   <div class="row">
-                      <div class="col-md-12" style="position: relative; height: 450px; width: 100%;">
-                          <div class="layui-card">
-                              <div class="layui-card-header">demo table</div>
-                              <display-table></display-table>
-                          </div>
+                      <div class="col-md-12">
+                          <display-table
+                                      :preview_dataset="previewDataset"
+                                      :highlight_columns="highlightColumnIndexes"></display-table>
                       </div>
-                      <div class="col-md-12" style="position: relative; height: 300px; width: 100%;">
-                           <div class="layui-card">
-                              <div class="layui-card-header">demo recipe</div>
-                              <div class="layui-card-body" style="position: relative; height: 275px;overflow-y: scroll; padding-right: 5px">
-                                  <form class="layui-form">
-                                      <div class="layui-form-item">
-                                            <div>
-                                              <input type="checkbox" name="like1[write]" lay-skin="primary" title="写作" checked="">
-                                            </div>
-                                      </div>
-                                      <hr>
-                                      <div class="layui-form-item">
-                                            <div>
-                                              <input type="checkbox" name="like1[write]" lay-skin="primary" title="写作" checked="">
-                                            </div>
-                                      </div>
-                                      <hr>
-                                      <div class="layui-form-item">
-                                            <div>
-                                              <input type="checkbox" name="like1[write]" lay-skin="primary" title="写作" checked="">
-                                            </div>
-                                      </div>
-                                  </form>
-                              </div>
-                          </div>
+                      <div class="col-md-12" style="position: relative; height: 250px; width: 100%;overflow-y: scroll">
+                          <column-status-panel :column_profiling_result="columnProfilingResult"></column-status-panel>
+                          <recipe :recipe_list="recipeList"></recipe>
                       </div>
                   </div>
               </div>
@@ -157,6 +154,7 @@
     <!-- import JavaScript -->
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="{{ url_for('static', filename='js/inquery/app.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='node_modules/x-editable/dist/bootstrap3-editable/js/bootstrap-editable.min.js') }}"></script>

@@ -1,5 +1,5 @@
 from .. import socketio
-from app.profiling import profiling_util
+from app.profiling.Profiling_util import Profiling_util
 from flask_socketio import emit
 import os
 from .. import dataset_location
@@ -11,7 +11,7 @@ PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), dataset_location
 @socketio.on("post_files")
 def receiveDataset(json):
     filenames = json.get('filenames')[0]
-    pf = profiling_util.profiling_util(PATH + filenames)
+    pf = Profiling_util(PATH + filenames)
     session['filenames'] = filenames
     session.modified = True
     columns = pf.getColumns()
@@ -29,7 +29,7 @@ def receiveDateTimeColumn(json):
 @socketio.event
 def handle_my_event(json):
     print('receive socket message ' + str(json))
-    pf = profiling_util.profiling_util(PATH + 'qqq.csv')
+    pf = Profiling_util(PATH + 'qqq.csv')
     columns = pf.getColumns()
     emit('myemit', columns)
     return "emit response from flask"
