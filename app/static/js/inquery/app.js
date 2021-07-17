@@ -41,7 +41,7 @@ new window.Vue({
             this.deleteColumns = result.delete_column_pre;
             this.fillMissingColumns = result.fill_missing_value_pre;
             this.splitColumns = result.split_column_pre;
-            this.changeTypeColumns = result.change_column_pre;
+            this.changeTypeColumns = result.change_column_type_pre;
         },
         async submitForm(e) {
             e.preventDefault();
@@ -66,34 +66,15 @@ new window.Vue({
             this.highlightColumnIndexes = message.index
         },
         handleColumnProfilingResult(message) {
-            tagObj = {
-                'distinct_count_without_nan': {
-                    'value': message.distinct_count_without_nan
-                },
-                'is_unique': {
-                    'value': message.is_unique,
-                    'type': 'success'
-                },
-                'p_missing': {
-                    'value': this.roundUtil(message.p_missing) * 100 + '%',
-                    'type': 'danger'
-                },
-                'p_distinct': {
-                    'value': this.roundUtil(message.p_distinct) * 100 + '%',
-                    'type': 'info'
-                },
-                'top-frequency': {
-                    'value': message.top,
-                    'type': 'warning'
-                }
-            }
-            this.columnProfilingResult = tagObj
+            this.columnProfilingResult = message;
         },
         handlePreviewDatasetChanged(message) {
-            this.previewDataset = message
-        },
-        roundUtil(num) {
-            return Math.round(num * 10000) / 10000
+            this.previewDataset = message;
+            var column_list_new = [];
+            for (item of message.headers) {
+                column_list_new.push({index: item.index, type: item.type, name: item.prop});
+            }
+            this.columnList = column_list_new;
         },
         handleRecipeEvent(message) {
             switch (message.type) {
@@ -104,9 +85,14 @@ new window.Vue({
               case 'fillMissingValue':
                 this.previewFillMissingColumns.push(message.data);
                 this.recipeList.push(message);
-              case 'Papayas':
-                console.log('Mangoes and papayas are $2.79 a pound.');
-                // expected output: "Mangoes and papayas are $2.79 a pound."
+                break;
+              case 'splittingColumnValue':
+                this.previewSplittingColumns.push(message.data);
+                this.recipeList.push(message);
+                break;
+              case 'changeColumnType':
+                this.previewChangeTypeColumns.push(message.data);
+                this.recipeList.push(message);
                 break;
               default:
                 console.log(`Sorry, we are out of ${expr}.`);
@@ -121,7 +107,12 @@ new window.Vue({
         'filling-missing-value-group': window.httpVueLoader("/static/js/components/fillingMissingValueGroup.vue"),
         'preview-and-add-recipe-group': window.httpVueLoader("/static/js/components/previewAndAddRecipeGroup.vue"),
         'recipe': window.httpVueLoader("/static/js/components/recipe.vue"),
-        'profiling-column': window.httpVueLoader("/static/js/components/profilingColumn.vue")
+        'profiling-column': window.httpVueLoader("/static/js/components/profilingColumn.vue"),
+        'splitting-column-group': window.httpVueLoader("/static/js/components/splittingColumnGroup.vue"),
+        'change-column-type-group': window.httpVueLoader("/static/js/components/changeColumnType.vue"),
+        'stringRule': window.httpVueLoader("/static/js/components/stringRule.vue"),
+        'query-builder-group': window.httpVueLoader("/static/js/components/queryBuilderGroup.vue"),
+
     },
     delimiters: ["${","}"]
 

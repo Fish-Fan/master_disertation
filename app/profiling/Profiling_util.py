@@ -4,6 +4,7 @@ import os
 from .. import report_html_location
 from datetime import datetime
 import json
+from app.util.ColumnUtil import ColumnUtil
 
 REPORT_HTML_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), report_html_location)
 
@@ -89,9 +90,52 @@ class Profiling_util:
         res = res.sort_values(ascending=False)
         return list(res.index)
 
-    def getColumnProfiling(self, columnName):
+    def getColumnProfiling(self, columnName, column_type_dict):
         df = self.df.copy()
-        profile = ProfileReport(df, config_file=REPORT_HTML_PATH + 'report_config.yml')
-        parsedJson = json.loads(profile.json)
-        ans = parsedJson['variables'][columnName]
-        return ans
+        column_df = df[columnName]
+        profiling_result = {}
+
+        columnType = 'string'
+        if column_type_dict and columnName in column_type_dict:
+            columnType = column_type_dict.get(columnName)
+
+        if columnType in ['int', 'float']:
+            profiling_result = self._profiling_numeric_column_(column_df, columnName, columnType)
+        else:
+            profiling_result = self._profiling_string_column_(column_df, columnName)
+        # missing value percentage
+        profiling_result['missing_value'] = 1 - column_df.count() / len(column_df)
+
+        if columnType != 'string':
+            # valid value percentage
+            column_util = ColumnUtil(column_df)
+            h = column_util.getColumnTypeHistogram(type=column_type_dict.get(columnName))
+            profiling_result['valid'] = h.get(column_type_dict.get(columnName))['count'] / len(column_df)
+
+        return profiling_result
+
+    def _profiling_string_column_(self, column_df, column_name):
+        profiling_result = {}
+        # calculate the percentage of uniqueness
+        profiling_result['distinct'] = len(column_df.unique().tolist()) / len(column_df)
+        if profiling_result.get('distinct') != 1.0:
+            # top frequency
+            profiling_result['top_frequency'] = column_df.mode()[0]
+        return profiling_result
+
+    def _profiling_numeric_column_(self, column_df, column_name, columnType ):
+        profiling_result = {}
+        column_util = ColumnUtil(column_df)
+        h = column_util.getColumnTypeHistogram(type=columnType)
+        column_series = pd.Series(h.get(columnType)['raw_data'], dtype=columnType)
+        # max
+        profiling_result['max'] = float(column_series.max())
+        # min
+        profiling_result['min'] = float(column_series.min())
+        # average
+        profiling_result['mean'] = column_series.mean()
+        # median
+        profiling_result['median'] = column_series.median()
+        # count of zero
+        profiling_result['zero'] = int(column_series.where(column_series == 0).count())
+        return profiling_result

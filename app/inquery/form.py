@@ -63,14 +63,14 @@ def columnProfiling():
         pf = Profiling_util(filenames, data_frame=session.get('preview_df'))
     else:
         pf = Profiling_util(DATASET_PATH + filenames)
-    ans = pf.getColumnProfiling(column)
-    return jsonify(ans)
+    ans = pf.getColumnProfiling(column, session['column_type_dict'])
+    return json.dumps(ans)
 
 @inquery.route('/preview', methods=['GET', 'POST'])
 def preview():
     filenames = 'new_uk_500.csv'
     pu = PreviewUtil(DATASET_PATH + filenames)
-    tmp = pu.getPreviewJson(request.get_json())
+    tmp = pu.getPreviewJson(request.get_json(), session=session)
     session['preview_df'] = pu.df.to_dict()
     return tmp
 

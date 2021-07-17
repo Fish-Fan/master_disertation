@@ -5,11 +5,11 @@
               size="small"
               @change="highlightColumnMethod"
               >
-        <el-radio-button  v-for="(index, name) in column_list"
-                             :label="name"
-                             :value="index"
-                             :key="index">
-            {{ name }}
+        <el-radio-button  v-for="column in column_list"
+                             :label="column.name"
+                             :value="column.index"
+                             :key="column.index">
+            {{ column.name }}
         </el-radio-button>
       </el-radio-group>
 
@@ -25,13 +25,6 @@
       async highlightColumnMethod() {
           column_name = this.highlightColumn;
           column_index = this.column_list[column_name];
-          // const requestOptions = {
-          //       method: "POST",
-          //       headers: { 'Accept': 'application/json', "Content-Type": "application/json"},
-          //       body: JSON.stringify({ column: column_name })
-          //      };
-          // const res = await fetch('/column_profiling', requestOptions);
-          // result = await res.json();
           this.$http.post('/column_profiling', {
               column: column_name
           }).then(response => {
@@ -40,6 +33,11 @@
           });
 
       }
+    },
+    watch: {
+        column_list: function (newVal, oldVal) {
+            this.column_list = newVal;
+        }
     },
     data() {
       return {

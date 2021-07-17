@@ -22,7 +22,7 @@ class Guidance:
         ans['split_column_pre'] = split_column_pre.marking()
 
         change_column_pre = ChangeColumnTypePreparator('change_column_pre', df)
-        ans['change_column_type'] = change_column_pre.marking()
+        ans['change_column_type_pre'] = change_column_pre.marking()
 
         return jsons.dumps(ans)
 

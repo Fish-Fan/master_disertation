@@ -12,18 +12,22 @@ class Preparator:
         self.name = name
         self.columnIndexMap = {}
         for index, col in enumerate(list(self.dataframe.columns)):
-            self.columnIndexMap[col] = index
+            self.columnIndexMap[col] = {'type': 'string', 'index': index, 'name': col}
 
 class MarkingResult:
-    def  __init__(self, score, column, index, data):
+    def  __init__(self, score, column, index, data, submit=None):
         self.score = score
         self.column = column
         self.data = data
         self.index = index
+        self.submit = submit
 
 class ListColumnPreparator(Preparator):
     def getColumnList(self):
-        return self.columnIndexMap
+        column_arr = []
+        for key, column in self.columnIndexMap.items():
+            column_arr.append(column)
+        return column_arr
 
 class DeleteColumnPreparator(Preparator):
     def marking(self):
@@ -36,7 +40,7 @@ class DeleteColumnPreparator(Preparator):
         d = res.to_dict()
         markResList = []
         for key, value in d.items():
-            markResList.append(MarkingResult(value, key, self.columnIndexMap.get(key),None))
+            markResList.append(MarkingResult(value, key, self.columnIndexMap.get(key)['index'],None))
         return markResList
 
 class FillMissingValuePreparator(Preparator):
@@ -63,7 +67,7 @@ class FillMissingValuePreparator(Preparator):
                 data['fillWay'] = 'calculating'
                 data['fillMethod'] = 'frequency'
                 data['fillValue'] = column_util.getMostFrequency()
-            markResList.append(MarkingResult(score, column, self.columnIndexMap.get(column), data))
+            markResList.append(MarkingResult(score, column, self.columnIndexMap.get(column)['index'], data))
         return markResList
 
 class SplitColumnPreparator(Preparator):
@@ -75,9 +79,9 @@ class SplitColumnPreparator(Preparator):
         for column in columns:
             arr = list(df[column].dropna())
             de = DelimiterExtracter(arr)
-            delimiter = de.extractBestDelimiter()
-
-            markRes = MarkingResult(delimiter['score'], column, self.columnIndexMap.get(column),{'delimiter': delimiter['delimiter']})
+            de_arr = de.extractDelimiterSet()
+            submit_obj = {'delimiter': de_arr[0]['delimiter'], 'new_column_names': []}
+            markRes = MarkingResult(de_arr[0]['score'], column, self.columnIndexMap.get(column)['index'], de_arr, submit=submit_obj)
             markResList.append(markRes)
         return markResList
 
@@ -100,33 +104,21 @@ class ChangeColumnTypePreparator(Preparator):
         markResList = []
         for column in columns:
             column_df = df[column].dropna()
-
-            regex_list = {'int': r'^-?\d+$', 'float': r'^\d+.{1}\d+$',
-                                    'email': r'^([a-zA-Z0-9._-]+)@([a-zA-Z0-9]+).([a-zA-Z0-9]+)$',
-                                    'postal': r'^[A-Z]{1,2}[0-9]{1,2}[A-Z]?\s?[0-9][A-Z]{2}$'}
-            d = defaultdict(int)
-            d['string'] = 0
-            for value in list(column_df):
-                count = 0
-                for name, reg in regex_list.items():
-                    if re.match(reg, str(value)):
-                        d[name] += 1
-                        count += 1
-                if count == 0:
-                    d['string'] += 1
-            d = OrderedDict(sorted(d.items(), key=lambda t: t[1], reverse=True))
+            column_util = ColumnUtil(column_df)
+            d = column_util.getColumnTypeHistogram()
             res = {}
-            res['score'] = 1 - d.get('string') / len(column_df)
+            res['score'] = 1 - d.get('string')['count'] / len(column_df)
             # get the most match count
-            for key, value in d.items():
-                if value > len(column_df) // 2:
-                    res['type'] = key
+            for dataType, matched_obj in d.items():
+                if matched_obj['count'] > len(column_df) // 2:
+                    res['type'] = dataType
                 else:
                     res['score'] = 0.0
                 break
-            markRes = MarkingResult(res['score'], column, self.columnIndexMap.get(column), {'type': res['type']})
+            markRes = MarkingResult(res['score'], column, self.columnIndexMap.get(column)['index'], {'type': res['type']})
             markResList.append(markRes)
         return markResList
+
 
 
 if __name__ == '__main__':

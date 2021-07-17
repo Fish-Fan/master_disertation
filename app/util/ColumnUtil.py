@@ -9,26 +9,47 @@ class ColumnUtil:
         return self.column_df.mode()[0]
 
     def guessColumnType(self):
-        types = {
-            'int': r'^-?\d+$',
-            'float': r'^\d+.{1}\d+$',
-            'email': r'^([a-zA-Z0-9._-]+)@([a-zA-Z0-9]+).([a-zA-Z0-9]+)$',
-            'postal': r'^[A-Z]{1,2}[0-9]{1,2}[A-Z]?\s?[0-9][A-Z]{2}$'
-        }
+        column_type = {}
+        h = self.getColumnTypeHistogram()
+        for type, matched_obj in h.items():
+            if matched_obj['count'] > len(self.column_df) // 2:
+                column_type['type'] = type
+                column_type['matchValues'] = matched_obj['raw_data']
+            else:
+                column_type['type'] = 'string'
+                column_type['matchValues'] = h.get('string')['raw_data']
+        return column_type
 
+    def getColumnTypeHistogram(self, type=None):
+        regex_list = {'int': r'^-?\d+$', 'float': r'^\d+.{1}\d+$',
+                      'email': r'^([a-zA-Z0-9._-]+)@([a-zA-Z0-9]+).([a-zA-Z0-9]+)([.uk]*)$',
+                      'postal': r'^[A-Z]{1,2}[0-9]{1,2}[A-Z]?\s?[0-9][A-Z]{2}$'}
         d = defaultdict(list)
+        # in case of NoneType occurrence
+        d['string'] = []
         for value in list(self.column_df):
-            count = 0
-            for name, reg in types.items():
+            if type:
+                name, reg = type, regex_list.get(type)
                 if re.match(reg, str(value)):
                     d[name].append(value)
-                    count += 1
-            if count == 0:
-                d['string'].append(value)
-        d = OrderedDict(sorted(d.items(), key=lambda t: t[1], reverse=True))
-        for key, matched_arr in d.items():
-            if len(matched_arr) > len(self.column_df) // 2:
-                return {'type': key, 'matchValues': matched_arr}
+                else:
+                    d['string'].append(value)
             else:
-                return {'type': 'string', 'matchValues': matched_arr}
+                count = 0
+                for name, reg in regex_list.items():
+                    if re.match(reg, str(value)):
+                        d[name].append(value)
+                        count += 1
+                if count == 0:
+                    d['string'].append(value)
+
+        d = self._construct_return_value_(d)
+        return d
+
+    def _construct_return_value_(self, d):
+        ans = {}
+        for dataType, matchedArr in d.items():
+            ans[dataType] = {'raw_data': matchedArr,'count': len(matchedArr)}
+        return OrderedDict(sorted(ans.items(), key=lambda t: t[1]['count'], reverse=True))
+
 

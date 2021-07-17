@@ -57,7 +57,7 @@
               type: 'fillMissingValue',
               description: this.concatRecipeDescription(fillItem),
               data: fillItem
-          }
+          };
         this.$emit('fill-missing-value-recipe-event', fillMissingValueRecipe)
       },
       concatRecipeDescription(fillItem) {

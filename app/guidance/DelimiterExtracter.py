@@ -29,7 +29,7 @@ class DelimiterExtracter:
 
         for s in regList:
             s = re.sub(r'\\', '', s)
-            arr = re.findall(r'[(]{1}([~+!@#$%^&*./-]{1}|[\s]+)[)]{1}', s)
+            arr = re.findall(r'[(]{1}([,~+!@#$%^&*./-]{1}|[\s]+)[)]{1}', s)
             for delimiter in arr:
                 delimiterSet.append(delimiter)
         return set(delimiterSet)
@@ -37,15 +37,13 @@ class DelimiterExtracter:
     def extractDelimiterSet(self):
         counters = self._determineRegex_(self.strList)
         delimiterSet = self._determineDelimiter_(counters)
-        return delimiterSet
-
-    def extractBestDelimiter(self):
-        delimiterSet = self.extractDelimiterSet()
         score_dict = {}
         for delimiter in delimiterSet:
+            max_count_split_columns = 0
             score_arr = []
             for row in self.strList:
                 split_arr = row.split(delimiter)
+                max_count_split_columns = max(max_count_split_columns, len(split_arr))
                 ratio_arr = []
                 for i in range(len(split_arr) - 1):
                     r1, r2 = self._id_to_regex_(split_arr[i]), self._id_to_regex_(split_arr[i + 1])
@@ -55,14 +53,20 @@ class DelimiterExtracter:
                 else:
                     score_arr.append(1.0)
             meanScore = pd.Series(score_arr).mean()
-            score_dict[delimiter] = meanScore
-        d = OrderedDict(sorted(score_dict.items(), key=lambda t: t[1], reverse=True))
-        ans = {}
+            score_dict[delimiter] = {'max_split_column_count': max_count_split_columns, 'score': meanScore}
+        d = OrderedDict(sorted(score_dict.items(), key=lambda t: t[1]['score'], reverse=True))
+        ans = []
         for key, value in d.items():
-            ans['delimiter'] = key
-            ans['score'] = value
-            break
+            ans_item = {}
+            ans_item['delimiter'] = key
+            ans_item['score'] = value['score']
+            ans_item['max_count'] = value['max_split_column_count']
+            ans.append(ans_item)
+        ans.sort(key=lambda x: x['score'], reverse=True)
         return ans
+
+    def extractBestDelimiter(self):
+        pass
 
     def _similiar_(self, a, b):
         return SequenceMatcher(None, a, b).ratio()
@@ -118,6 +122,6 @@ if __name__ == '__main__':
                     "2020/01/02"]
 
 
-    de = DelimiterExtracter(date_samples)
-    delimiterSet = de.extractDelimiter()
+    de = DelimiterExtracter(phone_samples)
+    delimiterSet = de.extractBestDelimiter()
     print(delimiterSet)
