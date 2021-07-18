@@ -17,7 +17,7 @@ class DataFrameConverter:
         ans = {}
         ans["tableData"] = parsed
         ans['headers'] = self._getHeaders_(customHeaders=customHeaders)
-        return json.dumps(ans)
+        return ans
 
 
     def _getHeaders_(self, customHeaders=None):

@@ -14,32 +14,13 @@
     },
     methods: {
         async preview() {
-            fillMissingValueData = this.preProcessFillMissingValueData();
             this.$http.post('/preview', {
-                    deleteObj: {columns: this.preview_delete_columns},
-                    fillingMissingObj: {columns: fillMissingValueData},
-                    splittingObj: {columns: this.preview_splitting_columns},
-                    changeTypeObj: {columns: this.preview_change_type_columns}
+                    recipe_list: this.recipe_list
                 }).then(response => {
                     this.$emit('preview-dataset-changed', response.body)
             })
 
         },
-        preProcessFillMissingValueData() {
-            ansMap = new Map();
-            for (const item of this.preview_fill_missing_columns) {
-                ansMap.set(item.column, item.fillValue)
-            }
-            ans = [];
-            for(let [key, value] of ansMap) {
-                ans.push({
-                    column: key,
-                    fillValue: value
-                })
-            }
-            return ans
-        }
-
     },
     data() {
       return {

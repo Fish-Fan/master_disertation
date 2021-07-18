@@ -18,6 +18,7 @@ class ColumnUtil:
             else:
                 column_type['type'] = 'string'
                 column_type['matchValues'] = h.get('string')['raw_data']
+            break
         return column_type
 
     def getColumnTypeHistogram(self, type=None):

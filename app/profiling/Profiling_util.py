@@ -90,27 +90,24 @@ class Profiling_util:
         res = res.sort_values(ascending=False)
         return list(res.index)
 
-    def getColumnProfiling(self, columnName, column_type_dict):
+    def getColumnProfiling(self, columnName):
         df = self.df.copy()
         column_df = df[columnName]
         profiling_result = {}
 
-        columnType = 'string'
-        if column_type_dict and columnName in column_type_dict:
-            columnType = column_type_dict.get(columnName)
-
-        if columnType in ['int', 'float']:
-            profiling_result = self._profiling_numeric_column_(column_df, columnName, columnType)
+        columnType = str(self.df[columnName].dtype)
+        if 'int' in columnType or 'float' in columnType:
+            profiling_result = self._profiling_numeric_column_(column_df)
         else:
             profiling_result = self._profiling_string_column_(column_df, columnName)
         # missing value percentage
         profiling_result['missing_value'] = 1 - column_df.count() / len(column_df)
 
-        if columnType != 'string':
-            # valid value percentage
-            column_util = ColumnUtil(column_df)
-            h = column_util.getColumnTypeHistogram(type=column_type_dict.get(columnName))
-            profiling_result['valid'] = h.get(column_type_dict.get(columnName))['count'] / len(column_df)
+        # if columnType != 'string':
+        #     # valid value percentage
+        #     column_util = ColumnUtil(column_df)
+        #     h = column_util.getColumnTypeHistogram(type=column_type_dict.get(columnName))
+        #     profiling_result['valid'] = h.get(column_type_dict.get(columnName))['count'] / len(column_df)
 
         return profiling_result
 
@@ -123,11 +120,9 @@ class Profiling_util:
             profiling_result['top_frequency'] = column_df.mode()[0]
         return profiling_result
 
-    def _profiling_numeric_column_(self, column_df, column_name, columnType ):
+    def _profiling_numeric_column_(self, column_df):
         profiling_result = {}
-        column_util = ColumnUtil(column_df)
-        h = column_util.getColumnTypeHistogram(type=columnType)
-        column_series = pd.Series(h.get(columnType)['raw_data'], dtype=columnType)
+        column_series = column_df.copy()
         # max
         profiling_result['max'] = float(column_series.max())
         # min

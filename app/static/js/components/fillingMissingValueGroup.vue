@@ -83,7 +83,9 @@
     },
     watch: {
         column_list: function(newVal, oldVal) {
-            this.activeTab = newVal[0].column
+            if (newVal.length > 0) {
+                this.activeTab = newVal[0].column
+            }
         }
     }
   }

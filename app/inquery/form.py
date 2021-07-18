@@ -10,7 +10,7 @@ from ..util.WorkflowGenerator import WorkflowGenerator
 from ..util.PreviewUtil import PreviewUtil
 from ..util.DataFrameConverter import DataFrameConverter
 from ..guidance.Guidance import Guidance
-import json
+import jsons
 
 
 DATASET_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), dataset_location)
@@ -27,7 +27,7 @@ def getDataset():
 def doProfiling():
     filenames = request.get_json()['filename']
     guidance = Guidance(DATASET_PATH + filenames)
-    return guidance.analysis()
+    return jsons.dumps(guidance.analysis())
 
 
 @inquery.route('/generateworkflow', methods=['POST'])
@@ -63,14 +63,14 @@ def columnProfiling():
         pf = Profiling_util(filenames, data_frame=session.get('preview_df'))
     else:
         pf = Profiling_util(DATASET_PATH + filenames)
-    ans = pf.getColumnProfiling(column, session['column_type_dict'])
-    return json.dumps(ans)
+    ans = pf.getColumnProfiling(column)
+    return jsons.dumps(ans)
 
 @inquery.route('/preview', methods=['GET', 'POST'])
 def preview():
     filenames = 'new_uk_500.csv'
     pu = PreviewUtil(DATASET_PATH + filenames)
-    tmp = pu.getPreviewJson(request.get_json(), session=session)
+    tmp = pu.getPreviewJson(request.get_json())
     session['preview_df'] = pu.df.to_dict()
     return tmp
 

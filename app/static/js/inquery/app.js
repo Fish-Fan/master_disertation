@@ -19,10 +19,6 @@ new window.Vue({
         highlightCellPositions: [],
         columnProfilingResult: {},
         /*preview props*/
-        previewDeleteColumns: [],
-        previewFillMissingColumns: [],
-        previewSplittingColumns: [],
-        previewChangeTypeColumns: [],
         previewDataset: {},
         /*recipe list*/
         recipeList: []
@@ -69,34 +65,18 @@ new window.Vue({
             this.columnProfilingResult = message;
         },
         handlePreviewDatasetChanged(message) {
-            this.previewDataset = message;
-            var column_list_new = [];
-            for (item of message.headers) {
-                column_list_new.push({index: item.index, type: item.type, name: item.prop});
-            }
-            this.columnList = column_list_new;
+            this.previewDataset = message.preview_dataset;
+            this.columnList = message.profiling_result.list_column_pre;
+            this.deleteColumns = message.profiling_result.delete_column_pre;
+            this.fillMissingColumns = message.profiling_result.fill_missing_value_pre;
+            this.splitColumns = message.profiling_result.split_column_pre;
+            this.changeTypeColumns = message.profiling_result.change_column_type_pre;
         },
         handleRecipeEvent(message) {
-            switch (message.type) {
-              case 'deleteColumn':
-                this.previewDeleteColumns = message.data;
-                this.recipeList.push(message);
-                break;
-              case 'fillMissingValue':
-                this.previewFillMissingColumns.push(message.data);
-                this.recipeList.push(message);
-                break;
-              case 'splittingColumnValue':
-                this.previewSplittingColumns.push(message.data);
-                this.recipeList.push(message);
-                break;
-              case 'changeColumnType':
-                this.previewChangeTypeColumns.push(message.data);
-                this.recipeList.push(message);
-                break;
-              default:
-                console.log(`Sorry, we are out of ${expr}.`);
-            }
+            this.recipeList.push(message);
+        },
+        handleRemoveRecipeItemEvent(message) {
+            this.recipeList.splice(message.item_index, 1);
         }
 
     },
@@ -112,6 +92,7 @@ new window.Vue({
         'change-column-type-group': window.httpVueLoader("/static/js/components/changeColumnType.vue"),
         'stringRule': window.httpVueLoader("/static/js/components/stringRule.vue"),
         'query-builder-group': window.httpVueLoader("/static/js/components/queryBuilderGroup.vue"),
+        'wrapper': window.httpVueLoader("/static/js/components/wrapper.vue")
 
     },
     delimiters: ["${","}"]

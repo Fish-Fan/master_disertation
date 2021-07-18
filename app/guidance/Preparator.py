@@ -14,13 +14,17 @@ class Preparator:
         for index, col in enumerate(list(self.dataframe.columns)):
             self.columnIndexMap[col] = {'type': 'string', 'index': index, 'name': col}
 
+    def _update_column_index_map_(self):
+        self.columnIndexMap = {}
+        for index, col in enumerate(list(self.dataframe.columns)):
+            self.columnIndexMap[col] = {'type': 'string', 'index': index, 'name': col}
+
 class MarkingResult:
-    def  __init__(self, score, column, index, data, submit=None):
+    def  __init__(self, score, column, index, data):
         self.score = score
         self.column = column
         self.data = data
         self.index = index
-        self.submit = submit
 
 class ListColumnPreparator(Preparator):
     def getColumnList(self):
@@ -80,9 +84,9 @@ class SplitColumnPreparator(Preparator):
             arr = list(df[column].dropna())
             de = DelimiterExtracter(arr)
             de_arr = de.extractDelimiterSet()
-            submit_obj = {'delimiter': de_arr[0]['delimiter'], 'new_column_names': []}
-            markRes = MarkingResult(de_arr[0]['score'], column, self.columnIndexMap.get(column)['index'], de_arr, submit=submit_obj)
-            markResList.append(markRes)
+            if de_arr:
+                markRes = MarkingResult(de_arr[0]['score'], column, self.columnIndexMap.get(column)['index'], de_arr)
+                markResList.append(markRes)
         return markResList
 
 

@@ -78,8 +78,12 @@
           <div class="modal-body">
             <div class="row">
               <div class="col-md-4" style="overflow-y: scroll; height: 750px">
+
+                  <wrapper></wrapper>
+
                   <form action="/generateworkflow" id="inquery-form">
                       <button class="btn btn-primary" @click="profiling">profiling</button>
+
 
                       <div class="form-group">
                           <label>profiling for each columns:</label>
@@ -93,7 +97,8 @@
                           <label>suggestions for deleting columns:</label>
                           <delete-column-group
                                   v-on:delete-recipe-event="handleRecipeEvent"
-                                  :column_list="deleteColumns"
+                                  :column_list="columnList"
+                                  :delete_list="deleteColumns"
                           ></delete-column-group>
                       </div>
 
@@ -118,11 +123,9 @@
                       </div>
                       <div class="form-group">
                           <label>Would like to add some filters? </label>
-                          <query-builder-group :column_list="columnList"></query-builder-group>
-                      </div>
-                      <div class="form-group">
-                          <label>try something new?</label>
-<!--                          <query-builder-group-simple></query-builder-group-simple>-->
+                          <query-builder-group
+                                  v-on:query-builder-recipe-event="handleRecipeEvent"
+                                  :column_list="columnList"></query-builder-group>
                       </div>
                       <preview-and-add-recipe-group
                               v-on:preview-dataset-changed="handlePreviewDatasetChanged"
@@ -139,7 +142,9 @@
                       </div>
                       <div class="col-md-12" style="position: relative; height: 250px; width: 100%;overflow-y: scroll">
                           <column-status-panel :column_profiling_result="columnProfilingResult"></column-status-panel>
-                          <recipe :recipe_list="recipeList"></recipe>
+                          <recipe
+                                  v-on:remove-recipe-item-event="handleRemoveRecipeItemEvent"
+                                  :recipe_list="recipeList"></recipe>
                       </div>
                   </div>
               </div>

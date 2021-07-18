@@ -2,6 +2,7 @@
     <el-tabs v-model="activeTab" tab-position="top">
         <el-tab-pane
                 v-for="column_item_obj in submitSplitColumns"
+                :key="'splitting-tab-' + column_item_obj.index "
                 :name="column_item_obj.column"
                 :label="column_item_obj.column">
             <el-form ref="form" :model="column_item_obj.form">
@@ -137,9 +138,10 @@
     },
     watch: {
         column_list: function (newVal, oldVal) {
-            this.submitSplitColumns = this.computeSubmitSplitColumns(newVal);
-            this.activeTab = newVal[0].column;
-            console.log(newVal[0].column);
+            if (newVal.length > 0) {
+                this.submitSplitColumns = this.computeSubmitSplitColumns(newVal);
+                this.activeTab = newVal[0].column;
+            }
         }
     },
     data() {

@@ -6,7 +6,7 @@
               @change="highlightColumnMethod"
               >
         <el-radio-button  v-for="column in column_list"
-                             :label="column.name"
+                             :label="column.index"
                              :value="column.index"
                              :key="column.index">
             {{ column.name }}
@@ -22,14 +22,13 @@
         proxy: 'http://127.0.0.1:5000/'
     },
     methods: {
-      async highlightColumnMethod() {
-          column_name = this.highlightColumn;
-          column_index = this.column_list[column_name];
+      async highlightColumnMethod(index) {
+          var column_item = this.column_list[index];
           this.$http.post('/column_profiling', {
-              column: column_name
+              column: column_item.name
           }).then(response => {
               this.$emit('column-profiling-result', response.body);
-              this.$emit('highlight-columns-changed', {index: column_index})
+              this.$emit('highlight-columns-changed', {index: column_item.index})
           });
 
       }

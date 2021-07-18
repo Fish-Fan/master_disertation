@@ -4,11 +4,11 @@
                 v-for="column_item in column_list"
                 :name="column_item.column"
                 :label="column_item.column"
-                :key="column_item.index"
+                :key="'change-column-type-' + column_item.index"
         >
             <el-form ref="form" :model="column_item">
                 <el-form-item label="choose your column type">
-                    <el-select v-model="column_item.data.type" placeholder="select" @change="handleDelimiterChangeEvent(column_item_obj.form)">
+                    <el-select v-model="column_item.data.type" placeholder="select">
                         <el-option
                           v-for="(typeOption, index) in typeOptions"
                           :key="index"
@@ -30,22 +30,22 @@
   module.exports = {
     props: ['column_list'],
     methods: {
-        computedActiveTab: function () {
-            if (this.column_list.length != 0) {
-                return column_list[0].column;
-            } else {
-                return ''
-            }
-        },
         concatenateDescription: function(changeItem) {
             return 'change ' + changeItem.column + ' column type into ' + changeItem.data.type;
         },
         addRecipe(changeItem) {
-            changeItem.column = this.activeTab;
-            changeColumnTypeRecipe = {
+            var data_obj = {
+                column : this.activeTab,
+                index: changeItem.index,
+                data: {
+                    type: changeItem.data.type
+                }
+            };
+
+            var changeColumnTypeRecipe = {
                 type: 'changeColumnType',
-                description: this.concatenateDescription(changeItem),
-                data: changeItem
+                description: this.concatenateDescription(data_obj),
+                data: data_obj
             };
             this.$emit('change-column-type-event', changeColumnTypeRecipe);
         }
@@ -54,22 +54,23 @@
 
     },
     watch: {
-        column_list: function(newVal, oldVal) {
-            this.activeTab = newVal[0].column
+        column_list: function (newVal, oldVal) {
+            this.activeTab = newVal[0].column;
         }
     },
     data() {
-      return {
-          submitSplitColumns: [],
-          activeTab: this.computedActiveTab(),
-          typeOptions: [
-              'string',
-              'int',
-              'float',
-              'email',
-              'postal'
-          ]
-      }
+        return {
+            activeTab: '',
+            typeOptions: [
+                'string',
+                'int',
+                'float',
+                'email',
+                'postal'
+            ]
+        }
     }
   }
+
+
 </script>
