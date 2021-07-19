@@ -1,24 +1,23 @@
 <template>
   <el-tabs value="View">
     <el-tab-pane label="Data Preview" name="View">
-      <el-table
-        :key="tableKey"
-        :data="tableData"
-        :cell-class-name="cellClassNameFunc"
-        style="width: 100%"
-        height="450"
-        border
-        v-loading="isLoad"
-        size="mini">
-          <el-table-column
-              v-for="item in headers"
-              :prop="item.prop"
-              :label="item.label"
-              :index="item.index"
-              width="180">
-          </el-table-column>
-
-      </el-table>
+        <u-table
+          v-loading="loading"
+          ref="plTable"
+          :cell-class-name="cellClassNameFunc"
+          :data="tableData"
+          height="450"
+          use-virtual
+          size="mini"
+          :fit="true"
+          :show-header="true"
+          border>
+          <u-table-column
+             v-for="item in headers"
+             :prop="item.prop"
+             :label="item.label"
+             :index="item.index"/>
+        </u-table>
     </el-tab-pane>
   </el-tabs>
 
@@ -42,12 +41,6 @@
         devServer: {
             proxy: 'http://127.0.0.1:5000/'
         },
-        async mounted() {
-            this.$http.get('/demodataset').then(response => {
-               this.tableData = response.body.tableData;
-               this.headers = response.body.headers;
-            })
-        },
         methods: {
           cellClassNameFunc({row, column, rowIndex, columnIndex}) {
             if (columnIndex == this.highlight_columns) {
@@ -60,8 +53,12 @@
             this.tableKey++
           },
           preview_dataset: function(newVal, oldVal) {
-            this.tableData = newVal['tableData']
-            this.headers = newVal['headers']
+            this.loading = true;
+            this.tableData = newVal['tableData'];
+            this.headers = newVal['headers'];
+            setTimeout(() => {
+                this.loading = false;
+            }, 2000);
           }
         },
         data() {
@@ -69,7 +66,8 @@
                 tableKey: 1,
                 isLoad: false,
                 tableData: [],
-                headers: []
+                headers: [],
+                loading: false
             }
         }
     }

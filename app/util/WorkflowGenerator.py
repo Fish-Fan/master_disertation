@@ -111,7 +111,7 @@ if __name__ == '__main__':
     removeColumns = removeColumns[:-1]
     dateTime = {'date': True, 'time': True}
     dateTimeColumnsIdx = 0
-    filename = 'qqq.csv'
+    filename = 'traffic_data.csv'
     ge = WorkflowGenerator()
     str = ge.generator(removeColumns, dateTime, dateTimeColumnsIdx, filename)
     print(str)

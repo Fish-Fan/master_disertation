@@ -3,8 +3,8 @@ from pandas_profiling import ProfileReport
 import os
 from .. import report_html_location
 from datetime import datetime
-import json
-from app.util.ColumnUtil import ColumnUtil
+from collections import OrderedDict
+from app.util.PatternExtracter import PatternExtracter
 
 REPORT_HTML_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), report_html_location)
 
@@ -95,13 +95,18 @@ class Profiling_util:
         column_df = df[columnName]
         profiling_result = {}
 
-        columnType = str(self.df[columnName].dtype)
-        if 'int' in columnType or 'float' in columnType:
-            profiling_result = self._profiling_numeric_column_(column_df)
-        else:
-            profiling_result = self._profiling_string_column_(column_df, columnName)
         # missing value percentage
         profiling_result['missing_value'] = 1 - column_df.count() / len(column_df)
+        # if this column is empty, return it
+        if profiling_result['missing_value'] == 1:
+            return profiling_result
+
+        columnType = str(self.df[columnName].dtype)
+        if 'int' in columnType or 'float' in columnType:
+            self._profiling_numeric_column_(column_df, profiling_result)
+        else:
+            self._profiling_string_column_(column_df, columnName, profiling_result)
+        profiling_result['total'] = str(column_df.count())
 
         # if columnType != 'string':
         #     # valid value percentage
@@ -111,17 +116,28 @@ class Profiling_util:
 
         return profiling_result
 
-    def _profiling_string_column_(self, column_df, column_name):
-        profiling_result = {}
+    def _profiling_string_column_(self, column_df, column_name, profiling_result):
+
         # calculate the percentage of uniqueness
         profiling_result['distinct'] = len(column_df.unique().tolist()) / len(column_df)
         if profiling_result.get('distinct') != 1.0:
             # top frequency
             profiling_result['top_frequency'] = column_df.mode()[0]
-        return profiling_result
+            # extract pattern
+            patter_extracter = PatternExtracter(list(column_df.dropna()))
+            pattern_matchedValue_dict = patter_extracter.determineRegex()
+            order_pattern_matchedValue_dict = OrderedDict(sorted(pattern_matchedValue_dict.items(), key=lambda t: len(t[1]), reverse=True))
 
-    def _profiling_numeric_column_(self, column_df):
-        profiling_result = {}
+            pattern_ans = []
+            count = 0
+            for reg, matchedValue in order_pattern_matchedValue_dict.items():
+                pattern_ans.append({'pattern': reg.replace('\\', '')[1:-1], 'percentage': round(len(matchedValue) / column_df.count() * 100, 2)})
+                count += 1
+                if count == 3:
+                    break
+            profiling_result['patterns_percentage'] = pattern_ans
+
+    def _profiling_numeric_column_(self, column_df, profiling_result):
         column_series = column_df.copy()
         # max
         profiling_result['max'] = float(column_series.max())
@@ -133,4 +149,3 @@ class Profiling_util:
         profiling_result['median'] = column_series.median()
         # count of zero
         profiling_result['zero'] = int(column_series.where(column_series == 0).count())
-        return profiling_result

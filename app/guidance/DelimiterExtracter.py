@@ -3,25 +3,11 @@ import pandas as pd
 import re
 from collections import OrderedDict
 from difflib import SequenceMatcher
+from app.util.PatternExtracter import PatternExtracter
 
 class DelimiterExtracter:
     def __init__(self, strList):
         self.strList = strList
-
-    def _id_to_regex_(self, id):
-        x = re.escape(id)
-        x = re.sub(r'([^a-zA-Z0-9]+[~+!@#$%^&*./-]*[\s]*)', r'(\1)', x)
-        x = re.sub(r'[a-zA-Z]+', r'([A-Z)]+)', x)
-        x = re.sub(r'[0-9]+', r'([0-9]+)', x)
-        return '^' + x + '$'
-
-    def _determineRegex_(self, identifiers):
-        patterns = defaultdict(set)
-        for id in identifiers:
-            pattern = self._id_to_regex_(id)
-            patterns[pattern].add(id)
-
-        return patterns
 
     def _determineDelimiter_(self, counters):
         regList = counters.keys()
@@ -29,13 +15,14 @@ class DelimiterExtracter:
 
         for s in regList:
             s = re.sub(r'\\', '', s)
-            arr = re.findall(r'[(]{1}([,~+!@#$%^&*./-]{1}|[\s]+)[)]{1}', s)
+            arr = re.findall(r'[(]{1}([,=_~+!@#$%^&*./<>:-]{1}|[\s]+)[)]{1}', s)
             for delimiter in arr:
                 delimiterSet.append(delimiter)
         return set(delimiterSet)
 
     def extractDelimiterSet(self):
-        counters = self._determineRegex_(self.strList)
+        pattern_extracter = PatternExtracter(self.strList)
+        counters = pattern_extracter.determineRegex()
         delimiterSet = self._determineDelimiter_(counters)
         score_dict = {}
         for delimiter in delimiterSet:
@@ -46,7 +33,7 @@ class DelimiterExtracter:
                 max_count_split_columns = max(max_count_split_columns, len(split_arr))
                 ratio_arr = []
                 for i in range(len(split_arr) - 1):
-                    r1, r2 = self._id_to_regex_(split_arr[i]), self._id_to_regex_(split_arr[i + 1])
+                    r1, r2 = pattern_extracter.str_to_regex(split_arr[i]), pattern_extracter.str_to_regex(split_arr[i + 1])
                     ratio_arr.append(self._similiar_(r1, r2))
                 if ratio_arr:
                     score_arr.append(sum(ratio_arr) / len(ratio_arr))

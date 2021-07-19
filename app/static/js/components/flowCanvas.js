@@ -400,14 +400,22 @@ define(["model/flow", "util", 'socket'], function(Flow, Util, Socket) {
     //pop modal to choose dataset
     Canvas.prototype._showEducation = function() {
         $.get("/dataset", function(data) {
-            var id = 'education', type = 'checkbox';
+            var id = 'education', type = 'radio';
             Util.generateModalwithInput(id, 'Choose your dataset', data, type, () => {
-                var array = [];
+                var filename = '';
                 d3.selectAll('input[name="'+ id +'_'+ type +'"]:checked').each(function(d,i) {
-                     array.push(d3.select(this).attr('value'))
+                     filename = d3.select(this).attr('value')
                 });
-                post_data = {'filenames': array};
-                Socket.post_files(post_data);
+                post_data = {'filenames': filename};
+                $.ajax({
+                    url: '/post_files',
+                    contentType: 'application/json',
+                    type: 'POST',
+                    data: JSON.stringify(post_data),
+                    dataType: 'json'
+                }).always(function (data) {
+                    $('#inquery-modal').modal();
+                });
             });
         });
     };
@@ -465,7 +473,7 @@ define(["model/flow", "util", 'socket'], function(Flow, Util, Socket) {
         //     post_data = {'datetimeColumn': array};
         //     Socket.post_datetime_column(post_data);
         // });
-        $('#inquery-modal').modal();
+
         // $('#pandas-profiling-result').html(response);
         // console.log(response)
     });

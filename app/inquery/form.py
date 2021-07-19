@@ -23,9 +23,19 @@ def getDataset():
     print(filenames)
     return jsonify(filenames)
 
+# receive user picked filename
+@inquery.route("/post_files", methods=['GET', 'POST'])
+def receiveDataset():
+    filenames = request.get_json()['filenames']
+    session.pop('filenames', None)
+    session.pop('preview_df', None)
+    session['filenames'] = filenames
+    session.modified = True
+    return "success"
+
 @inquery.route("/profiling", methods=['POST'])
 def doProfiling():
-    filenames = request.get_json()['filename']
+    filenames = session['filenames']
     guidance = Guidance(DATASET_PATH + filenames)
     return jsons.dumps(guidance.analysis())
 
@@ -48,16 +58,16 @@ def generateworkflow():
     workFlowJson = generator.generator(rawRemoveColumns, dateTime, rawDateTimeColumns,rawFileName)
     return workFlowJson
 
-@inquery.route('/demodataset', methods=['GET', 'POST'])
+@inquery.route('/getdataset', methods=['GET', 'POST'])
 def getDemodataset():
-    filenames = 'new_uk_500.csv'
+    filenames = session['filenames']
     dfc = DataFrameConverter(df=None, source=DATASET_PATH + filenames)
-    return dfc.doConvert()
+    return dfc.doConvert(useDefault=True)
 
 @inquery.route('/column_profiling', methods=['GET', 'POST'])
 def columnProfiling():
     column = request.get_json()['column']
-    filenames = 'new_uk_500.csv'
+    filenames = session['filenames']
     pf = None
     if 'preview_df' in session and session.get('preview_df'):
         pf = Profiling_util(filenames, data_frame=session.get('preview_df'))
@@ -68,7 +78,7 @@ def columnProfiling():
 
 @inquery.route('/preview', methods=['GET', 'POST'])
 def preview():
-    filenames = 'new_uk_500.csv'
+    filenames = session['filenames']
     pu = PreviewUtil(DATASET_PATH + filenames)
     tmp = pu.getPreviewJson(request.get_json())
     session['preview_df'] = pu.df.to_dict()

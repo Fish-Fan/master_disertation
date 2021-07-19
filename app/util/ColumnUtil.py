@@ -6,7 +6,10 @@ class ColumnUtil:
         self.column_df = column_df.dropna()
 
     def getMostFrequency(self):
-        return self.column_df.mode()[0]
+        if len(self.column_df) > 0:
+            return self.column_df.mode()[0]
+        else:
+            return ""
 
     def guessColumnType(self):
         column_type = {}

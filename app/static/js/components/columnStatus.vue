@@ -1,5 +1,6 @@
 <template>
-    <el-tabs value="View">
+    <div>
+        <el-tabs value="View">
         <el-tab-pane label="Column Profiling Result" name="View">
             <el-tag
                 v-for="(item, key) in column_profiling_result_data"
@@ -11,6 +12,18 @@
             </el-tag>
         </el-tab-pane>
     </el-tabs>
+
+    <div v-for="(pattern, index) in pattern_extract_data">
+            <el-tag size="mini" type="warning">{{ pattern.pattern }}</el-tag>
+            <el-progress
+            :percentage="pattern.percentage"
+            :color="computeStatusForProgressBar(index)"
+            ></el-progress>
+    </div>
+
+
+
+    </div>
 </template>
 
 <script>
@@ -73,21 +86,52 @@
                     'type': 'warning'
                 }
             }
+            if ('total' in message) {
+                tagObj.total = {
+                    'value': message.total,
+                    'type': 'info'
+                }
+            }
+
 
             return tagObj;
         },
         roundUtil(num) {
             return Math.round(num * 10000) / 10000
+        },
+        computeStatusForProgressBar(index) {
+            var color = '';
+            switch(index) {
+              case 0:
+                color = "#67C23A";
+                break;
+              case 1:
+                color = "#E6A23C";
+                break;
+              case 2:
+                color = "#F56C6C";
+                break;
+            }
+            return color
+        },
+        displayPattern(pattern) {
+            return pattern.pattern;
         }
     },
     watch: {
       column_profiling_result: function(newVal, oldVal) {
           this.column_profiling_result_data = this.construct_profiling_result(newVal);
+          if ('patterns_percentage' in newVal) {
+              this.pattern_extract_data = newVal.patterns_percentage;
+          } else {
+              this.pattern_extract_data = [];
+          }
       }
     },
     data() {
       return {
-        column_profiling_result_data: {}
+        column_profiling_result_data: {},
+        pattern_extract_data: []
       }
     }
   }

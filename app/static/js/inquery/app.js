@@ -38,6 +38,10 @@ new window.Vue({
             this.fillMissingColumns = result.fill_missing_value_pre;
             this.splitColumns = result.split_column_pre;
             this.changeTypeColumns = result.change_column_type_pre;
+
+            this.$http.get('/getdataset').then(response => {
+               this.previewDataset = response.body;
+            })
         },
         async submitForm(e) {
             e.preventDefault();

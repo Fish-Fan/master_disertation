@@ -10,13 +10,16 @@ class DataFrameConverter:
 
 
 
-    def doConvert(self, customHeaders=None):
+    def doConvert(self, customHeaders=None, useDefault=False):
         df = self.df.copy()
         result = df.to_json(orient="records")
         parsed = json.loads(result)
         ans = {}
         ans["tableData"] = parsed
-        ans['headers'] = self._getHeaders_(customHeaders=customHeaders)
+        if useDefault:
+            ans['headers'] = self._getHeaders_(customHeaders=self.get_default_column_type_dict())
+        else:
+            ans['headers'] = self._getHeaders_(customHeaders=customHeaders)
         return ans
 
 
@@ -27,7 +30,7 @@ class DataFrameConverter:
             item = {}
             item['prop'] = col
             item['label'] = self._concatenate_headers_(col, customHeaders)
-            item['index'] = i
+            item['index'] = i+1
             item['type'] = self._get_column_type_(customHeaders, col)
             headers.append(item)
 
@@ -47,5 +50,17 @@ class DataFrameConverter:
             return customHeaders.get(col)
         else:
             return 'string'
+
+    def get_default_column_type_dict(self):
+        column_type_dict = {}
+        columns = list(self.df.columns)
+
+        for column in columns:
+            column_type = str(self.df[column].dtype)
+            if column_type != "object":
+                column_type_dict[column] = column_type
+            else:
+                column_type_dict[column] = 'string'
+        return column_type_dict
 
 

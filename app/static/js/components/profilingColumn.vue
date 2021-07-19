@@ -1,6 +1,7 @@
 <template>
     <div style="margin-top: 20px">
       <el-radio-group
+              v-loading="loading"
               v-model="highlightColumn"
               size="small"
               @change="highlightColumnMethod"
@@ -35,12 +36,17 @@
     },
     watch: {
         column_list: function (newVal, oldVal) {
+            this.loading = true;
             this.column_list = newVal;
+            setTimeout(() => {
+                this.loading = false;
+            }, 2000);
         }
     },
     data() {
       return {
-        highlightColumn: 'string'
+        highlightColumn: 'string',
+        loading: false
       }
     }
   }

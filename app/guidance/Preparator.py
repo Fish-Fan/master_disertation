@@ -82,11 +82,12 @@ class SplitColumnPreparator(Preparator):
         markResList = []
         for column in columns:
             arr = list(df[column].dropna())
-            de = DelimiterExtracter(arr)
-            de_arr = de.extractDelimiterSet()
-            if de_arr:
-                markRes = MarkingResult(de_arr[0]['score'], column, self.columnIndexMap.get(column)['index'], de_arr)
-                markResList.append(markRes)
+            if arr and 'object' == str(df[column].dtype):
+                de = DelimiterExtracter(arr)
+                de_arr = de.extractDelimiterSet()
+                if de_arr:
+                    markRes = MarkingResult(de_arr[0]['score'], column, self.columnIndexMap.get(column)['index'], de_arr)
+                    markResList.append(markRes)
         return markResList
 
 
@@ -108,19 +109,21 @@ class ChangeColumnTypePreparator(Preparator):
         markResList = []
         for column in columns:
             column_df = df[column].dropna()
-            column_util = ColumnUtil(column_df)
-            d = column_util.getColumnTypeHistogram()
-            res = {}
-            res['score'] = 1 - d.get('string')['count'] / len(column_df)
-            # get the most match count
-            for dataType, matched_obj in d.items():
-                if matched_obj['count'] > len(column_df) // 2:
-                    res['type'] = dataType
-                else:
-                    res['score'] = 0.0
-                break
-            markRes = MarkingResult(res['score'], column, self.columnIndexMap.get(column)['index'], {'type': res['type']})
-            markResList.append(markRes)
+            if len(column_df) > 0:
+                column_util = ColumnUtil(column_df)
+                d = column_util.getColumnTypeHistogram()
+                res = {}
+                res['score'] = 1 - d.get('string')['count'] / len(column_df)
+                # get the most match count
+                for dataType, matched_obj in d.items():
+                    if matched_obj['count'] > len(column_df) // 2:
+                        res['type'] = dataType
+                    else:
+                        res['score'] = 0.0
+                    break
+                markRes = MarkingResult(res['score'], column, self.columnIndexMap.get(column)['index'],
+                                        {'type': res['type']})
+                markResList.append(markRes)
         return markResList
 
 
