@@ -4,6 +4,7 @@ import re
 from collections import OrderedDict
 from difflib import SequenceMatcher
 from app.util.PatternExtracter import PatternExtracter
+from app.util.ConfigparserHelper import ConfigparserHelper
 
 class DelimiterExtracter:
     def __init__(self, strList):
@@ -15,7 +16,9 @@ class DelimiterExtracter:
 
         for s in regList:
             s = re.sub(r'\\', '', s)
-            arr = re.findall(r'[(]{1}([,=_~+!@#$%^&*./<>:-]{1}|[\s]+)[)]{1}', s)
+            ch = ConfigparserHelper()
+            d = ch.getValue('regx', 'delimiter')
+            arr = re.findall(r'[(]{1}(['+ d +']{1}|[\s]+)[)]{1}', s)
             for delimiter in arr:
                 delimiterSet.append(delimiter)
         return set(delimiterSet)

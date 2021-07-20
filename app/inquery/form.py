@@ -10,6 +10,7 @@ from ..util.WorkflowGenerator import WorkflowGenerator
 from ..util.PreviewUtil import PreviewUtil
 from ..util.DataFrameConverter import DataFrameConverter
 from ..guidance.Guidance import Guidance
+from app.util.ColumnFormatHelper import ColumnFormatHelper
 import jsons
 
 
@@ -36,7 +37,10 @@ def receiveDataset():
 @inquery.route("/profiling", methods=['POST'])
 def doProfiling():
     filenames = session['filenames']
-    guidance = Guidance(DATASET_PATH + filenames)
+    session.pop('column_type_dict', None)
+    cfh = ColumnFormatHelper(DATASET_PATH + filenames)
+    guidance = Guidance(DATASET_PATH + filenames, cfh.get_original_data_format())
+    session['column_type_dict'] = cfh.get_original_data_format()
     return jsons.dumps(guidance.analysis())
 
 
@@ -73,14 +77,14 @@ def columnProfiling():
         pf = Profiling_util(filenames, data_frame=session.get('preview_df'))
     else:
         pf = Profiling_util(DATASET_PATH + filenames)
-    ans = pf.getColumnProfiling(column)
+    ans = pf.getColumnProfiling(column, session['column_type_dict'])
     return jsons.dumps(ans)
 
 @inquery.route('/preview', methods=['GET', 'POST'])
 def preview():
     filenames = session['filenames']
     pu = PreviewUtil(DATASET_PATH + filenames)
-    tmp = pu.getPreviewJson(request.get_json())
+    tmp = pu.getPreviewJson(request.get_json(), session)
     session['preview_df'] = pu.df.to_dict()
     return tmp
 

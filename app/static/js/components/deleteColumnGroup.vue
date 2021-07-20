@@ -1,20 +1,22 @@
 <template>
     <div style="margin-top: 20px">
-        <p>suggestions:</p>
-      <el-checkbox-group
-              v-model="submitDeleteColumns_suggest"
-              size="small"
-              >
-          <el-checkbox
-                  v-for="item in delete_list"
-                             :label="item.column"
-                             :value="item.column"
-                             :key="item.index"
-          border>{{item.column}}
-          </el-checkbox>
+       <div v-for="suggest_obj in submitDeleteColumns_suggest_render">
+            <p> {{ suggest_obj.type }} </p>
+              <el-checkbox-group
+                      v-model="submitDeleteColumns_suggest"
+                      size="small"
+                      >
+                  <el-checkbox
+                          v-for="item in suggest_obj.arr"
+                                     :label="item.column"
+                                     :value="item.column"
+                                     :key="item.index"
+                  border>{{item.column}}
+                  </el-checkbox>
 
-          <el-divider></el-divider>
-      </el-checkbox-group>
+                  <el-divider></el-divider>
+              </el-checkbox-group>
+       </div>
 
         <p>other columns: </p>
 
@@ -54,6 +56,22 @@
       },
       computeSubmitDeleteColumns() {
           return this.submitDeleteColumns_suggest.concat(this.submitDeleteColumns_normal);
+      },
+      computesubmitDeleteColumns_suggest(newVal) {
+          var delete_column_suggest = [];
+          var delete_column_map = new Map();
+          delete_column_map.set('missing', []);
+          delete_column_map.set('constant', []);
+          delete_column_map.set('zero', []);
+          for (item of newVal) {
+              arr = delete_column_map.get(item.description);
+              arr.push(item);
+          }
+
+          for (let [type, arr] of delete_column_map) {
+              delete_column_suggest.push({'type': type, 'arr': arr});
+          }
+          this.submitDeleteColumns_suggest_render = delete_column_suggest;
       }
 
     },
@@ -74,6 +92,7 @@
             this.normalColumns = otherColumnsArr;
         },
         delete_list: function(newVal, oldVal) {
+            this.computesubmitDeleteColumns_suggest(newVal);
             this.submitDeleteColumns_suggest = [];
             this.submitDeleteColumns_normal = [];
         }
@@ -82,6 +101,7 @@
       return {
         submitDeleteColumns_suggest: [],
         submitDeleteColumns_normal: [],
+        submitDeleteColumns_suggest_render: [],
         normalColumns: []
       }
     }

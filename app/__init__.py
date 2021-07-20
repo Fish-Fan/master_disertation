@@ -6,6 +6,7 @@ from flask_session import Session
 socketio = SocketIO()
 dataset_location = '../dataset/'
 report_html_location = '../static/report_html/'
+config_location = '../static/resources/config.ini'
 
 def create_app():
     # create an application
@@ -25,6 +26,7 @@ def create_app():
     app.register_blueprint(originBlueprint)
     app.config['dataset_location'] = dataset_location
     app.config['report_html_location'] = report_html_location
+    app.config['config_location'] = config_location
     socketio.init_app(app)
     Session(app)
     return app

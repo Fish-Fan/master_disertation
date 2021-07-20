@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict
+from app.util.ConfigparserHelper import ConfigparserHelper
 
 class PatternExtracter:
     def __init__(self, strList):
@@ -7,8 +8,10 @@ class PatternExtracter:
 
     def str_to_regex(self, id):
         x = re.escape(id)
-        x = re.sub(r'([^a-zA-Z0-9]+[_~+!@#$%^&*./-]*[\s]*)', r'(\1)', x)
-        x = re.sub(r'[a-zA-Z]+', r'([A-Z)]+)', x)
+        ch = ConfigparserHelper()
+        delimiter = ch.getValue('regx', 'delimiter')
+        x = re.sub(r'([^a-zA-Z0-9]+['+ delimiter +']*[\s]*)', r'(\1)', x)
+        x = re.sub(r'[a-zA-Z]+', r'([A-Z]+)', x)
         x = re.sub(r'[0-9]+', r'([0-9]+)', x)
         return '^' + x + '$'
 

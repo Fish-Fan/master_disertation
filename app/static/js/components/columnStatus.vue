@@ -92,6 +92,12 @@
                     'type': 'info'
                 }
             }
+            if ('constant' in message) {
+                tagObj.constant = {
+                    'value': message.constant,
+                    'type': 'info'
+                }
+            }
 
 
             return tagObj;

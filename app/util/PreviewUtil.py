@@ -4,7 +4,7 @@ import numpy as np
 import jsons
 from app.util.DataFrameConverter import DataFrameConverter
 from flask import session
-from app.util.ColumnUtil import ColumnUtil
+from app.util.ColumnFormatHelper import ColumnFormatHelper
 from app.guidance.Guidance import Guidance
 
 class PreviewUtil():
@@ -13,7 +13,7 @@ class PreviewUtil():
         self.df = pd.read_csv(source)
 
 
-    def getPreviewJson(self, param):
+    def getPreviewJson(self, param, session):
         recipe_list = param['recipe_list']
         column_new_type_dict = {}
         for step in recipe_list:
@@ -31,9 +31,20 @@ class PreviewUtil():
         ans = {}
         dfc = DataFrameConverter(self.df, None)
         ans['preview_dataset'] = dfc.doConvert(customHeaders=column_new_type_dict)
-        g = Guidance(None, data_frame=self.df)
+        # update column type before doing analysis
+        column_type_dict = self._get_updated_column_type_dict_(column_new_type_dict)
+        session['column_type_dict'] = column_type_dict
+        g = Guidance(None, column_type_dict ,data_frame=self.df)
         ans['profiling_result'] = g.analysis()
         return jsons.dumps(ans)
+
+    def _get_updated_column_type_dict_(self, column_new_type_dict):
+        cfh = ColumnFormatHelper(None, data_frame=self.df)
+        column_type_dict = cfh.get_original_data_format()
+        for column_name, column_obj in column_type_dict.items():
+            if column_name in column_new_type_dict:
+                column_obj['type'] = column_new_type_dict.get(column_name)
+        return column_type_dict
 
 
     def _process_delete_operator_(self, deleteParam):
@@ -59,21 +70,21 @@ class PreviewUtil():
         column = changeTypeItem['column']
         newType = changeTypeItem['data']['type']
         column_new_type_dict[column] = newType
-        self._do_change_column_type_(column, newType)
+        # self._do_change_column_type_(column, newType)
 
 
-    def _do_change_column_type_(self, column_name, column_type):
-        regex_list = {'int': r'^-?\d+$', 'float': r'^\d+.{1}\d+$',
-                      'email': r'^([a-zA-Z0-9._-]+)@([a-zA-Z0-9]+).([a-zA-Z0-9]+)([.uk]*)$',
-                      'postal': r'^[A-Z]{1,2}[0-9]{1,2}[A-Z]?\s?[0-9][A-Z]{2}$'}
-        regx = regex_list.get(column_type)
-
-        self.df = self.df[self.df[column_name].notnull() & self.df[column_name].str.match(regx)]
-        # change column type
-        if column_type in ['int', 'float']:
-            self.df[column_name] = self.df[column_name].astype(column_type)
-        else:
-            self.df[column_name] = self.df[column_name].astype('string')
+    # def _do_change_column_type_(self, column_name, column_type):
+    #     regex_list = {'int': r'^-?\d+$', 'float': r'^\d+.{1}\d+$',
+    #                   'email': r'^([a-zA-Z0-9._-]+)@([a-zA-Z0-9]+).([a-zA-Z0-9]+)([.uk]*)$',
+    #                   'postal': r'^[A-Z]{1,2}[0-9]{1,2}[A-Z]?\s?[0-9][A-Z]{2}$'}
+    #     regx = regex_list.get(column_type)
+    #
+    #     self.df = self.df[self.df[column_name].notnull() & self.df[column_name].str.match(regx)]
+    #     # change column type
+    #     if column_type in ['int', 'float']:
+    #         self.df[column_name] = self.df[column_name].astype(column_type)
+    #     else:
+    #         self.df[column_name] = self.df[column_name].astype('string')
 
     def _process_query_bulider_operator_(self, queryBuilderParam):
         match_type = queryBuilderParam['matchType']

@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from pandas_profiling import ProfileReport
 import os
@@ -5,6 +6,7 @@ from .. import report_html_location
 from datetime import datetime
 from collections import OrderedDict
 from app.util.PatternExtracter import PatternExtracter
+from app.util.ColumnUtil import ColumnUtil
 
 REPORT_HTML_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), report_html_location)
 
@@ -90,9 +92,10 @@ class Profiling_util:
         res = res.sort_values(ascending=False)
         return list(res.index)
 
-    def getColumnProfiling(self, columnName):
+    def getColumnProfiling(self, columnName, column_type_dict):
         df = self.df.copy()
         column_df = df[columnName]
+        column_type = column_type_dict.get(columnName).get('type')
         profiling_result = {}
 
         # missing value percentage
@@ -101,18 +104,17 @@ class Profiling_util:
         if profiling_result['missing_value'] == 1:
             return profiling_result
 
-        columnType = str(self.df[columnName].dtype)
-        if 'int' in columnType or 'float' in columnType:
-            self._profiling_numeric_column_(column_df, profiling_result)
+        # detect constant column
+        self._profiling_column_detect_constant_column_(column_df, profiling_result)
+        # detect valid percentage
+        self._profiling_column_detect_valid_percentage_(column_df, profiling_result, column_type)
+
+        if 'int' in column_type or 'float' in column_type:
+            self._profiling_numeric_column_(column_df, profiling_result, column_type)
         else:
             self._profiling_string_column_(column_df, columnName, profiling_result)
         profiling_result['total'] = str(column_df.count())
 
-        # if columnType != 'string':
-        #     # valid value percentage
-        #     column_util = ColumnUtil(column_df)
-        #     h = column_util.getColumnTypeHistogram(type=column_type_dict.get(columnName))
-        #     profiling_result['valid'] = h.get(column_type_dict.get(columnName))['count'] / len(column_df)
 
         return profiling_result
 
@@ -123,22 +125,29 @@ class Profiling_util:
         if profiling_result.get('distinct') != 1.0:
             # top frequency
             profiling_result['top_frequency'] = column_df.mode()[0]
-            # extract pattern
-            patter_extracter = PatternExtracter(list(column_df.dropna()))
-            pattern_matchedValue_dict = patter_extracter.determineRegex()
-            order_pattern_matchedValue_dict = OrderedDict(sorted(pattern_matchedValue_dict.items(), key=lambda t: len(t[1]), reverse=True))
+        # extract pattern
+        self._profiling_string_column_extract_pattern_(column_df, profiling_result)
 
-            pattern_ans = []
-            count = 0
-            for reg, matchedValue in order_pattern_matchedValue_dict.items():
-                pattern_ans.append({'pattern': reg.replace('\\', '')[1:-1], 'percentage': round(len(matchedValue) / column_df.count() * 100, 2)})
-                count += 1
-                if count == 3:
-                    break
-            profiling_result['patterns_percentage'] = pattern_ans
+    def _profiling_string_column_extract_pattern_(self, column_df, profiling_result):
+        patter_extracter = PatternExtracter(list(column_df.dropna()))
+        pattern_matchedValue_dict = patter_extracter.determineRegex()
+        order_pattern_matchedValue_dict = OrderedDict(
+            sorted(pattern_matchedValue_dict.items(), key=lambda t: len(t[1]), reverse=True))
 
-    def _profiling_numeric_column_(self, column_df, profiling_result):
-        column_series = column_df.copy()
+        pattern_ans = []
+        count = 0
+        for reg, matchedValue in order_pattern_matchedValue_dict.items():
+            pattern_ans.append({'pattern': reg.replace('\\', '')[1:-1].replace('[A-Z]', 'word').replace('[0-9]', 'digit').replace('(', '{').replace(')', '}'),
+                                'percentage': round(len(matchedValue) / column_df.count() * 100, 2)})
+            count += 1
+            if count == 3:
+                break
+        profiling_result['patterns_percentage'] = pattern_ans
+
+    def _profiling_numeric_column_(self, column_df, profiling_result, column_type):
+        column_util = ColumnUtil(column_df)
+        h = column_util.getColumnTypeHistogram(type=column_type)
+        column_series = pd.Series(h.get(column_type)['raw_data'], dtype=np.dtype(column_type))
         # max
         profiling_result['max'] = float(column_series.max())
         # min
@@ -148,4 +157,17 @@ class Profiling_util:
         # median
         profiling_result['median'] = column_series.median()
         # count of zero
-        profiling_result['zero'] = int(column_series.where(column_series == 0).count())
+        profiling_result['zero'] = str(round(int(column_series.where(column_series == 0).count()) / len(column_df) * 100, 2)) + '%'
+
+    def _profiling_column_detect_constant_column_(self, column_df, profiling_result):
+        value_frequency_map = column_df.value_counts().to_dict()
+        if len(value_frequency_map.keys()) == 1:
+            for key, value in value_frequency_map.items():
+                profiling_result['constant'] = key
+
+    def _profiling_column_detect_valid_percentage_(self, column_df, profiling_result, column_type):
+        if column_type != 'object':
+            # valid value percentage
+            column_util = ColumnUtil(column_df)
+            h = column_util.getColumnTypeHistogram(type=column_type)
+            profiling_result['valid'] = h.get(column_type)['count'] / len(column_df)

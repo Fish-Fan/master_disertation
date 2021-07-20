@@ -4,27 +4,22 @@ import re
 from app.guidance.DelimiterExtracter import DelimiterExtracter
 from app.util.ColumnUtil import ColumnUtil
 from collections import defaultdict, OrderedDict
+from app.util.ColumnFormatHelper import ColumnFormatHelper
 import jsons
 
 class Preparator:
-    def __init__(self, name, dataframe):
+    def __init__(self, name, dataframe, columnIndexMap):
         self.dataframe = dataframe
         self.name = name
-        self.columnIndexMap = {}
-        for index, col in enumerate(list(self.dataframe.columns)):
-            self.columnIndexMap[col] = {'type': 'string', 'index': index, 'name': col}
-
-    def _update_column_index_map_(self):
-        self.columnIndexMap = {}
-        for index, col in enumerate(list(self.dataframe.columns)):
-            self.columnIndexMap[col] = {'type': 'string', 'index': index, 'name': col}
+        self.columnIndexMap = columnIndexMap
 
 class MarkingResult:
-    def  __init__(self, score, column, index, data):
+    def  __init__(self, score, column, index, data, description=None):
         self.score = score
         self.column = column
         self.data = data
         self.index = index
+        self.description = description
 
 class ListColumnPreparator(Preparator):
     def getColumnList(self):
@@ -35,6 +30,13 @@ class ListColumnPreparator(Preparator):
 
 class DeleteColumnPreparator(Preparator):
     def marking(self):
+        markResList = []
+        self._getMissingValueColumns_(markResList)
+        self._getConstantColumns_(markResList)
+        self._getZeroValuesColumns_(markResList)
+        return markResList
+
+    def _getMissingValueColumns_(self, markResList):
         df = self.dataframe.copy()
         df1 = df.loc[:, (df.isnull()).any()]
         res = pd.Series(data=len(df1), index=df1.columns) - df1.fillna(0).astype(bool).sum(axis=0)
@@ -42,10 +44,28 @@ class DeleteColumnPreparator(Preparator):
         res = res.sort_values(ascending=False)
 
         d = res.to_dict()
-        markResList = []
         for key, value in d.items():
-            markResList.append(MarkingResult(value, key, self.columnIndexMap.get(key)['index'],None))
-        return markResList
+            markResList.append(MarkingResult(value, key, self.columnIndexMap.get(key)['index'], None, description='missing'))
+
+    def _getConstantColumns_(self, markResList):
+        data = self.dataframe.copy()
+        data1 = data.loc[:, (data != data.iloc[0]).any()]
+        res = data.columns.difference(data1.columns)
+
+        for column_name in list(res):
+            markResList.append(MarkingResult(1.0, column_name, self.columnIndexMap.get(column_name)['index'], None, description='constant'))
+
+    def _getZeroValuesColumns_(self, markResList):
+        data = self.dataframe.copy()
+        res = data.count() - data.fillna(0).astype(bool).sum(axis=0)
+        res = res.div(4032) * 100
+        # setting threshold - 80%
+        res = res[res > 80]
+        res = (res / 100).round(2)
+        res = res.sort_values(ascending=False)
+
+        for column_name, score in res.to_dict().items():
+            markResList.append(MarkingResult(score, column_name, self.columnIndexMap.get(column_name)['index'], None, description='zero'))
 
 class FillMissingValuePreparator(Preparator):
     def marking(self):
@@ -60,19 +80,31 @@ class FillMissingValuePreparator(Preparator):
         markResList = []
 
         for column, score in d.items():
-            column_util = ColumnUtil(df[column])
-            column_type= column_util.guessColumnType()
+            column_obj = self.columnIndexMap.get(column)
+            column_type = column_obj['type']
             data = {}
-            if column_type.get('type') in ['int', 'float']:
-                data['fillWay'] = 'calculating'
-                data['fillMethod'] = 'mean'
-                data['fillValue'] = round(pd.Series(column_type.get('matchValues'), dtype=np.dtype(column_type.get('type'))).mean(), 2)
+            column_util = ColumnUtil(df[column])
+            if column_type == 'object':
+                guess_result = column_util.guessColumnType()
+                data = self._construct_column_data_(guess_result.get('type'), guess_result.get('matchValues'), column_util)
             else:
-                data['fillWay'] = 'calculating'
-                data['fillMethod'] = 'frequency'
-                data['fillValue'] = column_util.getMostFrequency()
+                h = column_util.getColumnTypeHistogram(type=column_type)
+                data = self._construct_column_data_(column_type, h.get(column_type)['raw_data'], column_util)
             markResList.append(MarkingResult(score, column, self.columnIndexMap.get(column)['index'], data))
         return markResList
+
+    def _construct_column_data_(self, type, matchedValues, column_util):
+        data = {}
+        if 'int' in type or 'float' in type:
+            data['fillWay'] = 'calculating'
+            data['fillMethod'] = 'mean'
+            data['fillValue'] = round(
+                pd.Series(matchedValues, dtype=np.dtype(type)).mean(), 2)
+        else:
+            data['fillWay'] = 'calculating'
+            data['fillMethod'] = 'frequency'
+            data['fillValue'] = column_util.getMostFrequency()
+        return data
 
 class SplitColumnPreparator(Preparator):
     def marking(self):
@@ -92,15 +124,6 @@ class SplitColumnPreparator(Preparator):
 
 
 
-    def _id_to_regex_(self, id):
-        x = re.escape(id)
-        x = re.sub(r'([^a-zA-Z0-9]+[~+!@#$%^&*./-]*[\s]*)', r'(\1)', x)
-        x = re.sub(r'[a-zA-Z]+', r'([A-Z)]+)', x)
-        x = re.sub(r'[0-9]+', r'([0-9]+)', x)
-        return '^' + x + '$'
-
-
-
 class ChangeColumnTypePreparator(Preparator):
     def marking(self):
         df = self.dataframe.copy()
@@ -108,22 +131,23 @@ class ChangeColumnTypePreparator(Preparator):
 
         markResList = []
         for column in columns:
-            column_df = df[column].dropna()
-            if len(column_df) > 0:
-                column_util = ColumnUtil(column_df)
-                d = column_util.getColumnTypeHistogram()
-                res = {}
-                res['score'] = 1 - d.get('string')['count'] / len(column_df)
-                # get the most match count
-                for dataType, matched_obj in d.items():
-                    if matched_obj['count'] > len(column_df) // 2:
-                        res['type'] = dataType
-                    else:
-                        res['score'] = 0.0
-                    break
-                markRes = MarkingResult(res['score'], column, self.columnIndexMap.get(column)['index'],
-                                        {'type': res['type']})
-                markResList.append(markRes)
+            if self.columnIndexMap.get(column)['type'] == 'object':
+                column_df = df[column].dropna()
+                if len(column_df) > 0:
+                    column_util = ColumnUtil(column_df)
+                    d = column_util.getColumnTypeHistogram()
+                    res = {}
+                    res['score'] = 1 - d.get('string')['count'] / len(column_df)
+                    # get the most match count
+                    for dataType, matched_obj in d.items():
+                        if matched_obj['count'] > len(column_df) // 2:
+                            res['type'] = dataType
+                        else:
+                            res['score'] = 0.0
+                        break
+                    markRes = MarkingResult(res['score'], column, self.columnIndexMap.get(column)['index'],
+                                            {'type': res['type']})
+                    markResList.append(markRes)
         return markResList
 
 
