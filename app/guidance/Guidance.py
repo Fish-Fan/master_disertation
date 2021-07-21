@@ -1,6 +1,7 @@
 import pandas as pd
 import jsons
 from app.util.ColumnFormatHelper import ColumnFormatHelper
+from collections import defaultdict, OrderedDict
 from app.guidance.Preparator import ListColumnPreparator, DeleteColumnPreparator, FillMissingValuePreparator, SplitColumnPreparator, ChangeColumnTypePreparator
 class Guidance:
     def __init__(self, source, columnTypeMap, data_frame=None):
@@ -29,7 +30,25 @@ class Guidance:
         change_column_pre = ChangeColumnTypePreparator('change_column_pre', self.df, self.columnTypeMap)
         ans['change_column_type_pre'] = change_column_pre.marking()
 
+        self.score_based_algorithm(ans)
         return ans
+
+
+    def score_based_algorithm(self, preparator_collection):
+        column_operation_dict = defaultdict(list)
+        for preparator, column_obj_collection in preparator_collection.items():
+            if preparator != 'list_column_pre':
+                for column_obj in column_obj_collection:
+                    column_name = column_obj.column
+                    column_operation_dict[column_name].append(column_obj)
+        for column_name, column_operation_collection in column_operation_dict.items():
+            column_operation_dict[column_name] = sorted(column_operation_collection, key=lambda x:x.score, reverse=True)
+
+        # for each column only suggest one type operation
+        for column_name, column_operation_collection in column_operation_dict.items():
+            if len(column_operation_collection) > 0:
+                column_operation_collection[0].recommend = True
+
 
 if __name__ == '__main__':
     source = '../dataset/new_uk_500.csv'

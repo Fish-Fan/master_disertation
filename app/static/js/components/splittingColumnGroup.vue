@@ -4,7 +4,8 @@
                 v-for="column_item_obj in submitSplitColumns"
                 :key="'splitting-tab-' + column_item_obj.index "
                 :name="column_item_obj.column"
-                :label="column_item_obj.column">
+                >
+            <span slot="label"><i v-if="column_item_obj.recommend" class="el-icon-star-on"></i> {{column_item_obj.column}}</span>
             <el-form ref="form" :model="column_item_obj.form">
                 <el-form-item label="choose your delimiter">
                     <el-select v-model="column_item_obj.form.submit.delimiter" placeholder="select" @change="handleDelimiterChangeEvent(column_item_obj.form)">
@@ -39,6 +40,7 @@
                 column_item_obj.column = column_item.column;
                 column_item_obj.index = column_item.index;
                 column_item_obj.score = column_item.score;
+                column_item_obj.recommend = column_item.recommend;
 
                 column_item_obj.form = {};
                 column_item_obj.form.delimiter_obj_list = [];

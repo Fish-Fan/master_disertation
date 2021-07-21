@@ -46,9 +46,18 @@ class ColumnUtil:
                         count += 1
                 if count == 0:
                     d['string'].append(value)
-
+        self._check_is_category_type_(d)
         d = self._construct_return_value_(d)
         return d
+
+    def _check_is_category_type_(self, d):
+        if len(self.column_df) > 0:
+            category_count = len(self.column_df.value_counts().keys())
+            value_count = len(self.column_df)
+            if category_count / value_count <= 0.01:
+                # empty string ans
+                d['category'] = d['string']
+                d['string'] = []
 
     def _construct_return_value_(self, d):
         ans = {}

@@ -23,8 +23,27 @@
         </el-form-item>
         <el-form-item v-for="(column, index) in query.filterList">
             <label>{{ column.name }}</label>
-            <el-input v-model="column.value" class="input-with-select" size="mini" :disabled="column.disabled">
-                <el-select v-if="column.type === 'int' || column.type === 'float'" v-model="column.operator" placeholder="select" size="mini" slot="prepend" @change="operatorChange(column)">
+            <div v-if="column.type === 'category'">
+                <el-select v-model="column.operator" placeholder="select" size="mini" @change="categoryOperatorChange(column)">
+                    <el-option
+                      v-for="(operator, index) in stringOperators"
+                      :key="index"
+                      :label="operator"
+                      :value="operator">
+                    </el-option>
+                </el-select>
+                <el-select v-model="column.value" placeholder="select" size="mini" :disabled="column.disabled">
+                    <el-option
+                      v-for="(category_item, index) in column.categories"
+                      :key="index"
+                      :label="category_item"
+                      :value="category_item">
+                    </el-option>
+                </el-select>
+                <el-button size="mini" icon="el-icon-remove" @click="handleRemoveButton(index)"></el-button>
+            </div>
+            <el-input v-else v-model="column.value" class="input-with-select" size="mini" :disabled="column.disabled">
+                <el-select v-if="column.type.includes('int') || column.type.includes('float')" v-model="column.operator" placeholder="select" size="mini" slot="prepend" @change="operatorChange(column)">
                     <el-option
                       v-for="(operator, index) in numberOperators"
                       :key="index"
@@ -52,6 +71,14 @@
   module.exports = {
     props: ['column_list'],
     methods: {
+        categoryOperatorChange(column) {
+            if (column.operator == 'is empty' || column.operator == 'is not empty') {
+                column.disabled = true;
+                column.value = "";
+            } else {
+                column.disabled = false;
+            }
+        },
         operatorChange(column) {
             if (column.operator == 'is empty' || column.operator == 'is not empty') {
                 column.disabled = true

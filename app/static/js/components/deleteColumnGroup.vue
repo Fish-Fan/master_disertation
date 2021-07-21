@@ -11,7 +11,7 @@
                                      :label="item.column"
                                      :value="item.column"
                                      :key="item.index"
-                  border>{{item.column}}
+                  border><i v-if="item.recommend" class="el-icon-star-off"></i> {{item.column}}
                   </el-checkbox>
 
                   <el-divider></el-divider>

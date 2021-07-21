@@ -3,10 +3,10 @@
       <el-tabs v-model="activeTab" type="card">
         <el-tab-pane
                 v-for="item in column_list"
-                :label="item.column"
                 :name="item.column"
                 :key="item.index"
         >
+            <span slot="label"><i v-if="item.recommend" class="el-icon-star-on"></i> {{item.column}}</span>
             <el-form ref="form" :model="item.data">
                 <el-form-item label="choose your filling way">
                     <el-select v-model="item.data.fillWay" placeholder="select">

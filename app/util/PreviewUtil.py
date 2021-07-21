@@ -44,6 +44,9 @@ class PreviewUtil():
         for column_name, column_obj in column_type_dict.items():
             if column_name in column_new_type_dict:
                 column_obj['type'] = column_new_type_dict.get(column_name)
+                if column_obj['type'] == 'category':
+                    column_obj['categories'] = list(self.df[column_name].value_counts().keys())
+
         return column_type_dict
 
 

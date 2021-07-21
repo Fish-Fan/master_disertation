@@ -3,9 +3,9 @@
         <el-tab-pane
                 v-for="column_item in column_list"
                 :name="column_item.column"
-                :label="column_item.column"
                 :key="'change-column-type-' + column_item.index"
         >
+            <span slot="label"><i v-if="column_item.recommend" class="el-icon-star-on"></i> {{column_item.column}}</span>
             <el-form ref="form" :model="column_item">
                 <el-form-item label="choose your column type">
                     <el-select v-model="column_item.data.type" placeholder="select">
@@ -66,7 +66,8 @@
                 'int',
                 'float',
                 'email',
-                'postal'
+                'postal',
+                'category'
             ]
         }
     }

@@ -20,6 +20,7 @@ class MarkingResult:
         self.data = data
         self.index = index
         self.description = description
+        self.recommend = False
 
 class ListColumnPreparator(Preparator):
     def getColumnList(self):
@@ -89,7 +90,8 @@ class FillMissingValuePreparator(Preparator):
                 data = self._construct_column_data_(guess_result.get('type'), guess_result.get('matchValues'), column_util)
             else:
                 h = column_util.getColumnTypeHistogram(type=column_type)
-                data = self._construct_column_data_(column_type, h.get(column_type)['raw_data'], column_util)
+                if not h:
+                    data = self._construct_column_data_(column_type, h.get(column_type)['raw_data'], column_util)
             markResList.append(MarkingResult(score, column, self.columnIndexMap.get(column)['index'], data))
         return markResList
 
