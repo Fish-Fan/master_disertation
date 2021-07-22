@@ -1,7 +1,6 @@
 <template>
-    <div style="margin-top: 20px">
+    <div style="margin-top: 20px" v-loading="loading">
       <el-radio-group
-              v-loading="loading"
               v-model="highlightColumn"
               size="small"
               @change="highlightColumnMethod"
@@ -18,7 +17,7 @@
 </template>
 <script>
   module.exports = {
-    props: ['column_list'],
+    props: ['column_list', 'is_loading'],
     devServer: {
         proxy: 'http://127.0.0.1:5000/'
     },
@@ -36,12 +35,12 @@
     },
     watch: {
         column_list: function (newVal, oldVal) {
-            this.loading = true;
             this.column_list = newVal;
-            setTimeout(() => {
-                this.loading = false;
-            }, 2000);
+        },
+        is_loading: function(newVal, oldVal) {
+            this.loading = newVal
         }
+
     },
     data() {
       return {

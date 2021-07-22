@@ -1,0 +1,222 @@
+{
+  "list_column_pre": [
+    {
+      "type": "object",
+      "index": 0,
+      "name": "Sdate",
+      "set_by_manual": false
+    },
+    {
+      "type": "int64",
+      "index": 1,
+      "name": "Cosit",
+      "set_by_manual": false
+    },
+    {
+      "type": "int64",
+      "index": 2,
+      "name": "LaneNumber",
+      "set_by_manual": false
+    },
+    {
+      "type": "object",
+      "index": 3,
+      "name": "LaneDescription",
+      "set_by_manual": false
+    },
+    {
+      "type": "int64",
+      "index": 4,
+      "name": "LaneDirection",
+      "set_by_manual": false
+    },
+    {
+      "type": "object",
+      "index": 5,
+      "name": "DirectionDescription",
+      "set_by_manual": false
+    },
+    {
+      "type": "int64",
+      "index": 6,
+      "name": "Volume",
+      "set_by_manual": false
+    },
+    {
+      "type": "int64",
+      "index": 7,
+      "name": "Flags",
+      "set_by_manual": false
+    },
+    {
+      "type": "float64",
+      "index": 8,
+      "name": "Flag Text",
+      "set_by_manual": false
+    },
+    {
+      "type": "int64",
+      "index": 9,
+      "name": "AvgSpeed",
+      "set_by_manual": false
+    },
+    {
+      "type": "int64",
+      "index": 10,
+      "name": "PmlHGV",
+      "set_by_manual": false
+    },
+    {
+      "type": "int64",
+      "index": 11,
+      "name": "Class1Volume",
+      "set_by_manual": false
+    },
+    {
+      "type": "int64",
+      "index": 12,
+      "name": "Class2Volume",
+      "set_by_manual": false
+    },
+    {
+      "type": "int64",
+      "index": 13,
+      "name": "Class3Volume",
+      "set_by_manual": false
+    },
+    {
+      "type": "int64",
+      "index": 14,
+      "name": "Class4Volume",
+      "set_by_manual": false
+    },
+    {
+      "type": "int64",
+      "index": 15,
+      "name": "Class5Volume",
+      "set_by_manual": false
+    },
+    {
+      "type": "int64",
+      "index": 16,
+      "name": "Class6Volume",
+      "set_by_manual": false
+    }
+  ],
+  "delete_column_pre": [
+    {
+      "column": "Flag Text",
+      "data": null,
+      "description": "missing",
+      "index": 8,
+      "recommend": true,
+      "score": 1.0
+    },
+    {
+      "column": "Cosit",
+      "data": null,
+      "description": "constant",
+      "index": 1,
+      "recommend": true,
+      "score": 1.0
+    },
+    {
+      "column": "Flags",
+      "data": null,
+      "description": "constant",
+      "index": 7,
+      "recommend": true,
+      "score": 1.0
+    },
+    {
+      "column": "Flags",
+      "data": null,
+      "description": "zero",
+      "index": 7,
+      "recommend": false,
+      "score": 1.0
+    }
+  ],
+  "fill_missing_value_pre": [
+    {
+      "column": "Flag Text",
+      "data": {},
+      "description": null,
+      "index": 8,
+      "recommend": false,
+      "score": 0.0
+    }
+  ],
+  "split_column_pre": [
+    {
+      "column": "Sdate",
+      "data": [
+        {
+          "delimiter": " ",
+          "score": 0.7547169811320755,
+          "max_count": 2
+        },
+        {
+          "delimiter": "/",
+          "score": 0.7325581395348838,
+          "max_count": 3
+        },
+        {
+          "delimiter": ":",
+          "score": 0.3703703703703703,
+          "max_count": 2
+        }
+      ],
+      "description": null,
+      "index": 0,
+      "recommend": true,
+      "score": 0.7547169811320755
+    },
+    {
+      "column": "LaneDescription",
+      "data": [
+        {
+          "delimiter": "_",
+          "score": 1.0,
+          "max_count": 2
+        }
+      ],
+      "description": null,
+      "index": 3,
+      "recommend": true,
+      "score": 1.0
+    }
+  ],
+  "change_column_type_pre": [
+    {
+      "column": "Sdate",
+      "data": {
+        "type": "string"
+      },
+      "description": null,
+      "index": 0,
+      "recommend": false,
+      "score": 0.0
+    },
+    {
+      "column": "LaneDescription",
+      "data": {
+        "type": "category"
+      },
+      "description": null,
+      "index": 3,
+      "recommend": false,
+      "score": 1.0
+    },
+    {
+      "column": "DirectionDescription",
+      "data": {
+        "type": "category"
+      },
+      "description": null,
+      "index": 5,
+      "recommend": true,
+      "score": 1.0
+    }
+  ]
+}

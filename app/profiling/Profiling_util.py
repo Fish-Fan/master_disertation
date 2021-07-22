@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from pandas_profiling import ProfileReport
 import os
+import math
 from .. import report_html_location
 from datetime import datetime
 from collections import OrderedDict
@@ -96,24 +97,33 @@ class Profiling_util:
         df = self.df.copy()
         column_df = df[columnName]
         column_type = column_type_dict.get(columnName).get('type')
+        column_type_set_by_manual = column_type_dict.get(columnName).get('set_by_manual')
         profiling_result = {}
 
         # missing value percentage
-        profiling_result['missing_value'] = 1 - column_df.count() / len(column_df)
-        # if this column is empty, return it
+        profiling_result['missing_value'] = 1 - round(column_df.count() / len(column_df), 2)
+        # if this column is empty, return early
         if profiling_result['missing_value'] == 1:
             return profiling_result
 
+        # total count of this column, excluded Nan value
+        profiling_result['total'] = str(column_df.count())
         # detect constant column
         self._profiling_column_detect_constant_column_(column_df, profiling_result)
+        # if this column is constant, return early
+        if 'constant' in profiling_result:
+            return profiling_result
         # detect valid percentage
-        self._profiling_column_detect_valid_percentage_(column_df, profiling_result, column_type)
+        if column_type_set_by_manual:
+            self._profiling_column_detect_valid_percentage_(column_df, profiling_result, column_type)
+        else:
+            profiling_result['valid'] = 1.0
 
         if 'int' in column_type or 'float' in column_type:
-            self._profiling_numeric_column_(column_df, profiling_result, column_type)
+            self._profiling_numeric_column_(column_df, profiling_result, column_type, column_type_set_by_manual)
         else:
             self._profiling_string_column_(column_df, columnName, profiling_result)
-        profiling_result['total'] = str(column_df.count())
+
 
 
         return profiling_result
@@ -121,7 +131,7 @@ class Profiling_util:
     def _profiling_string_column_(self, column_df, column_name, profiling_result):
 
         # calculate the percentage of uniqueness
-        profiling_result['distinct'] = len(column_df.unique().tolist()) / len(column_df)
+        profiling_result['distinct'] = round(len(column_df.unique().tolist()) / len(column_df), 2)
         if profiling_result.get('distinct') != 1.0:
             # top frequency
             profiling_result['top_frequency'] = column_df.mode()[0]
@@ -144,16 +154,20 @@ class Profiling_util:
                 break
         profiling_result['patterns_percentage'] = pattern_ans
 
-    def _profiling_numeric_column_(self, column_df, profiling_result, column_type):
-        column_util = ColumnUtil(column_df)
-        h = column_util.getColumnTypeHistogram(type=column_type)
-        column_series = pd.Series(h.get(column_type)['raw_data'], dtype=np.dtype(column_type))
+    def _profiling_numeric_column_(self, column_df, profiling_result, column_type, set_by_manual):
+        column_series = None
+        if set_by_manual:
+            column_util = ColumnUtil(column_df)
+            h = column_util.getColumnTypeHistogram(type=column_type)
+            column_series = pd.Series(h.get(column_type)['raw_data'], dtype=np.dtype(column_type))
+        else:
+            column_series = column_df
         # max
         profiling_result['max'] = float(column_series.max())
         # min
         profiling_result['min'] = float(column_series.min())
         # average
-        profiling_result['mean'] = column_series.mean()
+        profiling_result['mean'] = round(column_series.mean(), 2)
         # median
         profiling_result['median'] = column_series.median()
         # count of zero

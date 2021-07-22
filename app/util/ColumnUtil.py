@@ -25,7 +25,7 @@ class ColumnUtil:
         return column_type
 
     def getColumnTypeHistogram(self, type=None):
-        regex_list = {'int': r'^-?\d+$', 'float': r'^\d+.{1}\d+$',
+        regex_list = {'int': r'^-?\d+$', 'float': r'^[0-9]+[.]{1}[0-9]+$',
                       'email': r'^([a-zA-Z0-9._-]+)@([a-zA-Z0-9]+).([a-zA-Z0-9]+)([.uk]*)$',
                       'postal': r'^[A-Z]{1,2}[0-9]{1,2}[A-Z]?\s?[0-9][A-Z]{2}$'}
         d = defaultdict(list)

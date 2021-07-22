@@ -12,6 +12,7 @@ from ..util.DataFrameConverter import DataFrameConverter
 from ..guidance.Guidance import Guidance
 from app.util.ColumnFormatHelper import ColumnFormatHelper
 import jsons
+import sys, traceback
 
 
 DATASET_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), dataset_location)
@@ -66,7 +67,7 @@ def generateworkflow():
 def getDemodataset():
     filenames = session['filenames']
     dfc = DataFrameConverter(df=None, source=DATASET_PATH + filenames)
-    return dfc.doConvert(useDefault=True)
+    return dfc.doConvert(session['column_type_dict'])
 
 @inquery.route('/column_profiling', methods=['GET', 'POST'])
 def columnProfiling():
@@ -84,8 +85,12 @@ def columnProfiling():
 def preview():
     filenames = session['filenames']
     pu = PreviewUtil(DATASET_PATH + filenames)
-    tmp = pu.getPreviewJson(request.get_json(), session)
-    session['preview_df'] = pu.df.to_dict()
-    return tmp
+    try:
+        tmp = pu.getPreviewJson(request.get_json(), session)
+        session['preview_df'] = pu.df.to_dict()
+        return tmp
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({'code': 500, 'message': 'preview failure'}), 200, {'ContentType': 'application/json'}
 
 

@@ -1,5 +1,5 @@
 <template>
-    <div style="margin-top: 20px">
+    <div style="margin-top: 20px" v-loading="loading">
       <el-tabs v-model="activeTab" type="card">
         <el-tab-pane
                 v-for="item in column_list"
@@ -9,7 +9,7 @@
             <span slot="label"><i v-if="item.recommend" class="el-icon-star-on"></i> {{item.column}}</span>
             <el-form ref="form" :model="item.data">
                 <el-form-item label="choose your filling way">
-                    <el-select v-model="item.data.fillWay" placeholder="select">
+                    <el-select v-model="item.data.fillWay" placeholder="select" size="mini">
                         <el-option
                           v-for="(option, index) in fillWayOptions"
                           :key="index"
@@ -23,7 +23,7 @@
                 </el-form-item>
                 <div v-else>
                     <el-form-item label="fill the missing value">
-                    <el-select v-model="item.data.fillMethod" placeholder="select">
+                    <el-select v-model="item.data.fillMethod" placeholder="select" size="mini">
                         <el-option
                           v-for="(option, index) in fillWayMethods"
                           :key="index"
@@ -33,7 +33,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="fill value">
-                    <el-input v-model="item.data.fillValue" :disabled="true"></el-input>
+                    <el-input v-model="item.data.fillValue" :disabled="true" size="mini"></el-input>
                 </el-form-item>
                 </div>
                 <el-form-item>
@@ -46,7 +46,7 @@
 </template>
 <script>
   module.exports = {
-    props: ['column_list'],
+    props: ['column_list', 'is_loading'],
     devServer: {
         proxy: 'http://127.0.0.1:5000/'
     },
@@ -78,7 +78,8 @@
         fillWayOptions: ['manual', 'calculating'],
         fillWayMethods: ['frequency', 'average', 'mean'],
         fillMethod: '',
-        form: {}
+        form: {},
+        loading: false
       }
     },
     watch: {
@@ -86,6 +87,9 @@
             if (newVal.length > 0) {
                 this.activeTab = newVal[0].column
             }
+        },
+        is_loading: function(newVal, oldVal) {
+            this.loading = newVal;
         }
     }
   }

@@ -1,14 +1,14 @@
 <template>
-    <el-tabs v-model="activeTab" tab-position="top">
+    <el-tabs v-model="activeTab" tab-position="top" v-loading="loading">
         <el-tab-pane
                 v-for="column_item_obj in submitSplitColumns"
-                :key="'splitting-tab-' + column_item_obj.index "
+                :key="'splitting-tab-' + column_item_obj.index"
                 :name="column_item_obj.column"
                 >
             <span slot="label"><i v-if="column_item_obj.recommend" class="el-icon-star-on"></i> {{column_item_obj.column}}</span>
             <el-form ref="form" :model="column_item_obj.form">
                 <el-form-item label="choose your delimiter">
-                    <el-select v-model="column_item_obj.form.submit.delimiter" placeholder="select" @change="handleDelimiterChangeEvent(column_item_obj.form)">
+                    <el-select v-model="column_item_obj.form.submit.delimiter" placeholder="select" @change="handleDelimiterChangeEvent(column_item_obj.form)" size="mini">
                         <el-option
                           v-for="(delimiterItem, index) in column_item_obj.form.delimiter_obj_list"
                           :key="index"
@@ -18,7 +18,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item v-for="(new_column_item, index) in column_item_obj.form.submit.new_column_name_list" :label="computeLabel(index)">
-                    <el-input v-model="new_column_item.name"></el-input>
+                    <el-input v-model="new_column_item.name" size="mini"></el-input>
                 </el-form-item>
 
                 <el-form-item>
@@ -31,7 +31,7 @@
 
 <script>
   module.exports = {
-    props: ['column_list'],
+    props: ['column_list', 'is_loading'],
     methods: {
         computeSubmitSplitColumns: function() {
             var submitSplitColumns = [];
@@ -144,13 +144,17 @@
                 this.submitSplitColumns = this.computeSubmitSplitColumns(newVal);
                 this.activeTab = newVal[0].column;
             }
+        },
+        is_loading: function(newVal, oldVal) {
+            this.loading = newVal;
         }
     },
     data() {
       return {
           submitSplitColumns: [],
           activeTab: '',
-          columnMap: {}
+          columnMap: {},
+          loading: false
       }
     }
   }

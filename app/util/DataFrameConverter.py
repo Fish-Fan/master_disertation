@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+from app.util.ColumnFormatHelper import ColumnFormatHelper
 
 class DataFrameConverter:
     def __init__(self, df, source):
@@ -10,57 +11,48 @@ class DataFrameConverter:
 
 
 
-    def doConvert(self, customHeaders=None, useDefault=False):
+    def doConvert(self, column_type_dict, isGroupby=False):
         df = self.df.copy()
+        ans = {}
+        # if it is group by
+        if isGroupby:
+            ans['isGroupby'] = True
+            indexes_type_dict = self._get_indexes_column_type_dict_(list(df.index.names))
+            ans['indexes'] = self._getHeaders_(list(df.index.names), indexes_type_dict)
+            ans['columns'] = self._getHeaders_(list(df.columns), column_type_dict)
+            df = df.reset_index()
+        else:
+            ans['isGroupby'] = False
+            ans['headers'] = self._getHeaders_(list(df.columns), column_type_dict)
+
         result = df.to_json(orient="records")
         parsed = json.loads(result)
-        ans = {}
+
         ans["tableData"] = parsed
-        if useDefault:
-            ans['headers'] = self._getHeaders_(customHeaders=self.get_default_column_type_dict())
-        else:
-            ans['headers'] = self._getHeaders_(customHeaders=customHeaders)
+
         return ans
 
-
-    def _getHeaders_(self, customHeaders=None):
-        columns = list(self.df.columns)
+    def _getHeaders_(self, column_name_list, column_type_dict):
         headers = []
-        for i, col in enumerate(columns):
+        for i, col in enumerate(column_name_list):
             item = {}
             item['prop'] = col
-            item['label'] = self._concatenate_headers_(col, customHeaders)
+            item['label'] = self._concatenate_headers_(col, column_type_dict)
             item['index'] = i+1
-            item['type'] = self._get_column_type_(customHeaders, col)
+            item['type'] = column_type_dict[col]['type']
             headers.append(item)
 
         return headers
 
-    def _concatenate_headers_(self, label, customHeaders):
-        if customHeaders:
-            if label in customHeaders:
-                return label + ' (' + customHeaders.get(label) + ')'
-            else:
-                return label + ' (str)'
-        else:
-            return label + ' (str)'
+    def _concatenate_headers_(self, label, column_type_dict):
+        return '{} ({})'.format(label, column_type_dict[label]['type'])
 
-    def _get_column_type_(self, customHeaders, col):
-        if customHeaders and col in customHeaders:
-            return customHeaders.get(col)
-        else:
-            return 'string'
+    def _get_indexes_column_type_dict_(self, index_list):
+        df_tmp = self.df.reset_index()
+        df_tmp = df_tmp.loc[:, index_list]
+        cfh = ColumnFormatHelper(None, data_frame=df_tmp)
+        return cfh.get_original_data_format()
 
-    def get_default_column_type_dict(self):
-        column_type_dict = {}
-        columns = list(self.df.columns)
 
-        for column in columns:
-            column_type = str(self.df[column].dtype)
-            if column_type != "object":
-                column_type_dict[column] = column_type
-            else:
-                column_type_dict[column] = 'string'
-        return column_type_dict
 
 

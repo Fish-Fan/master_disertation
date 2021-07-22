@@ -14,10 +14,16 @@
     },
     methods: {
         async preview() {
+            this.$emit('is-loading-event', true);
             this.$http.post('/preview', {
                     recipe_list: this.recipe_list
                 }).then(response => {
-                    this.$emit('preview-dataset-changed', response.body)
+                    if (response.body.code == 500) {
+                        this.$message.error(response.body.message);
+                    } else {
+                        this.$emit('preview-dataset-changed', response.body);
+                    }
+                    this.$emit('is-loading-event', false);
             })
 
         },

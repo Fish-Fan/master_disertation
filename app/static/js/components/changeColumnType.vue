@@ -1,5 +1,5 @@
 <template>
-    <el-tabs v-model="activeTab" tab-position="top">
+    <el-tabs v-model="activeTab" tab-position="top" v-loading="loading">
         <el-tab-pane
                 v-for="column_item in column_list"
                 :name="column_item.column"
@@ -8,7 +8,7 @@
             <span slot="label"><i v-if="column_item.recommend" class="el-icon-star-on"></i> {{column_item.column}}</span>
             <el-form ref="form" :model="column_item">
                 <el-form-item label="choose your column type">
-                    <el-select v-model="column_item.data.type" placeholder="select">
+                    <el-select v-model="column_item.data.type" placeholder="select" size="mini">
                         <el-option
                           v-for="(typeOption, index) in typeOptions"
                           :key="index"
@@ -28,7 +28,7 @@
 
 <script>
   module.exports = {
-    props: ['column_list'],
+    props: ['column_list', 'is_loading'],
     methods: {
         concatenateDescription: function(changeItem) {
             return 'change ' + changeItem.column + ' column type into ' + changeItem.data.type;
@@ -55,7 +55,12 @@
     },
     watch: {
         column_list: function (newVal, oldVal) {
-            this.activeTab = newVal[0].column;
+            if (newVal.length > 0) {
+                this.activeTab = newVal[0].column;
+            }
+        },
+        is_loading: function(newVal, oldVal) {
+            this.loading = newVal;
         }
     },
     data() {
@@ -68,7 +73,8 @@
                 'email',
                 'postal',
                 'category'
-            ]
+            ],
+            loading: false
         }
     }
   }

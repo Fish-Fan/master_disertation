@@ -16,6 +16,7 @@ class PreviewUtil():
     def getPreviewJson(self, param, session):
         recipe_list = param['recipe_list']
         column_new_type_dict = {}
+        is_group_by = False
         for step in recipe_list:
             if step['type'] == 'deleteColumn':
                 self._process_delete_operator_(step['data'])
@@ -27,12 +28,14 @@ class PreviewUtil():
                 self._process_change_column_type_operator_(step['data'], column_new_type_dict)
             elif step['type'] == 'queryBuilder':
                 self._process_query_bulider_operator_(step['data'])
+            elif step['type'] == 'groupby':
+                is_group_by = self._process_groupby_operator_(step['data'])
 
         ans = {}
-        dfc = DataFrameConverter(self.df, None)
-        ans['preview_dataset'] = dfc.doConvert(customHeaders=column_new_type_dict)
         # update column type before doing analysis
         column_type_dict = self._get_updated_column_type_dict_(column_new_type_dict)
+        dfc = DataFrameConverter(self.df, None)
+        ans['preview_dataset'] = dfc.doConvert(column_type_dict, isGroupby=is_group_by)
         session['column_type_dict'] = column_type_dict
         g = Guidance(None, column_type_dict ,data_frame=self.df)
         ans['profiling_result'] = g.analysis()
@@ -44,6 +47,7 @@ class PreviewUtil():
         for column_name, column_obj in column_type_dict.items():
             if column_name in column_new_type_dict:
                 column_obj['type'] = column_new_type_dict.get(column_name)
+                column_obj['set_by_manual'] = True
                 if column_obj['type'] == 'category':
                     column_obj['categories'] = list(self.df[column_name].value_counts().keys())
 
@@ -131,6 +135,23 @@ class PreviewUtil():
         # pre process dataset
         self.df = self.df.query(expression)
 
+    def _process_groupby_operator_(self, groupbyParam):
+        splitters = groupbyParam['splitters']
+        column_aggregations = groupbyParam['column_aggregations']
+
+        agg_dict = {}
+        for column_aggregation_item in column_aggregations:
+            agg_dict[column_aggregation_item['column']] = column_aggregation_item['aggre_funcs']
+
+        self.df = self.df.groupby(splitters).agg(agg_dict)
+
+        new_column_names = []
+        for column_name, aggregation_funcs in agg_dict.items():
+            for aggregation_func_name in aggregation_funcs:
+                new_column_names.append('{}_{}'.format(column_name, aggregation_func_name))
+        self.df.columns = new_column_names
+
+        return True
 
 
 

@@ -1,7 +1,10 @@
 new window.Vue({
     el: '#inquery-modal',
+    devServer: {
+        proxy: 'http://127.0.0.1:5000/'
+    },
     data: {
-        filename: 'new_uk_500.csv',
+        is_loading: false,
         /*profiling result prop*/
         columnList: {},
         deleteColumns: [],
@@ -24,20 +27,18 @@ new window.Vue({
         recipeList: []
     },
     methods: {
-        async profiling(e) {
+        profiling(e) {
             e.preventDefault();
-            const requestOptions = {
-                method: "POST",
-                headers: { 'Accept': 'application/json', "Content-Type": "application/json" },
-                body: JSON.stringify({ filename: this.filename })
-            };
-            const res = await fetch('http://127.0.0.1:5000/profiling', requestOptions);
-            result = await res.json();
-            this.columnList = result.list_column_pre;
-            this.deleteColumns = result.delete_column_pre;
-            this.fillMissingColumns = result.fill_missing_value_pre;
-            this.splitColumns = result.split_column_pre;
-            this.changeTypeColumns = result.change_column_type_pre;
+            this.is_loading = true;
+            this.$http.post('/profiling', {}).then(response => {
+                result = response.body;
+                this.columnList = result.list_column_pre;
+                this.deleteColumns = result.delete_column_pre;
+                this.fillMissingColumns = result.fill_missing_value_pre;
+                this.splitColumns = result.split_column_pre;
+                this.changeTypeColumns = result.change_column_type_pre;
+                this.is_loading = false;
+            });
 
             this.$http.get('/getdataset').then(response => {
                this.previewDataset = response.body;
@@ -58,10 +59,6 @@ new window.Vue({
             const res = await fetch('http://127.0.0.1:5000/generateworkflow', requestOptions);
             result = await res.json();
         },
-        demoFun (message, e) {
-            e.preventDefault()
-            console.log(message)
-        },
         handleHighlightColumnsChanged(message) {
             this.highlightColumnIndexes = message.index
         },
@@ -81,6 +78,9 @@ new window.Vue({
         },
         handleRemoveRecipeItemEvent(message) {
             this.recipeList.splice(message.item_index, 1);
+        },
+        handleIsLoadingEvent(message) {
+            this.is_loading = message
         }
 
     },
@@ -96,7 +96,8 @@ new window.Vue({
         'change-column-type-group': window.httpVueLoader("/static/js/components/changeColumnType.vue"),
         'stringRule': window.httpVueLoader("/static/js/components/stringRule.vue"),
         'query-builder-group': window.httpVueLoader("/static/js/components/queryBuilderGroup.vue"),
-        'wrapper': window.httpVueLoader("/static/js/components/wrapper.vue")
+        'group-by': window.httpVueLoader("/static/js/components/groupby.vue")
+
 
     },
     delimiters: ["${","}"]

@@ -1,5 +1,5 @@
 <template>
-    <div style="margin-top: 20px">
+    <div style="margin-top: 20px" v-loading="loading">
        <div v-for="suggest_obj in submitDeleteColumns_suggest_render">
             <p> {{ suggest_obj.type }} </p>
               <el-checkbox-group
@@ -36,7 +36,7 @@
 </template>
 <script>
   module.exports = {
-    props: ['column_list', 'delete_list'],
+    props: ['column_list', 'delete_list', 'is_loading'],
     devServer: {
         proxy: 'http://127.0.0.1:5000/'
     },
@@ -95,6 +95,9 @@
             this.computesubmitDeleteColumns_suggest(newVal);
             this.submitDeleteColumns_suggest = [];
             this.submitDeleteColumns_normal = [];
+        },
+        is_loading: function(newVal, oldVal) {
+            this.loading = newVal;
         }
     },
     data() {
@@ -102,7 +105,8 @@
         submitDeleteColumns_suggest: [],
         submitDeleteColumns_normal: [],
         submitDeleteColumns_suggest_render: [],
-        normalColumns: []
+        normalColumns: [],
+        loading: false
       }
     }
   }

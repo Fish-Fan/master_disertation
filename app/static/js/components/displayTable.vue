@@ -1,18 +1,49 @@
 <template>
   <el-tabs value="View">
-    <el-tab-pane label="Data Preview" name="View">
+    <el-tab-pane label="Data Preview" name="View" style="height: 450px; margin-bottom: 20px">
         <u-table
+          v-if="isGroupby"
           v-loading="loading"
           ref="plTable"
           :cell-class-name="cellClassNameFunc"
           :data="tableData"
-          height="450"
           use-virtual
           size="mini"
+          max-height="450"
           :fit="true"
           :show-header="true"
           border>
-          <u-table-column
+          <u-table-column label="index">
+                <u-table-column
+                     v-for="item in indexes"
+                     :prop="item.prop"
+                     :label="item.label"
+                     :index="item.index">
+                </u-table-column>
+          </u-table-column>
+          <u-table-column label="columns">
+                <u-table-column
+                     v-for="item in columns"
+                     :prop="item.prop"
+                     :label="item.label"
+                     :index="item.index">
+                </u-table-column>
+          </u-table-column>
+        </u-table>
+
+        <u-table
+          v-else
+          v-loading="loading"
+          ref="plTable"
+          :cell-class-name="cellClassNameFunc"
+          :data="tableData"
+          use-virtual
+          size="mini"
+          max-height="450"
+          :fit="true"
+          :show-header="true"
+          border>
+            <u-table-column
              v-for="item in headers"
              :prop="item.prop"
              :label="item.label"
@@ -37,7 +68,7 @@
 
 <script>
     module.exports = {
-        props: ['highlight_columns', 'preview_dataset'],
+        props: ['highlight_columns', 'preview_dataset', 'is_loading'],
         devServer: {
             proxy: 'http://127.0.0.1:5000/'
         },
@@ -53,20 +84,26 @@
             this.tableKey++
           },
           preview_dataset: function(newVal, oldVal) {
-            this.loading = true;
             this.tableData = newVal['tableData'];
             this.headers = newVal['headers'];
-            setTimeout(() => {
-                this.loading = false;
-            }, 2000);
-          }
+            this.isGroupby = newVal['isGroupby'];
+            this.indexes = newVal['indexes'];
+            this.columns = newVal['columns'];
+          },
+           is_loading: function(newVal, oldVal) {
+                this.loading = newVal
+            }
         },
         data() {
             return {
                 tableKey: 1,
-                isLoad: false,
                 tableData: [],
+                /*for normal table*/
                 headers: [],
+                /*for group by table*/
+                indexes: [],
+                columns: [],
+                isGroupby: false,
                 loading: false
             }
         }

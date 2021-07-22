@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="form">
+  <el-form ref="form" v-loading="loading">
         <el-form-item>
             <el-select v-model="query.matchType" placeholder="select" size="mini">
                 <el-option
@@ -69,7 +69,7 @@
 
 <script>
   module.exports = {
-    props: ['column_list'],
+    props: ['column_list', 'is_loading'],
     methods: {
         categoryOperatorChange(column) {
             if (column.operator == 'is empty' || column.operator == 'is not empty') {
@@ -119,7 +119,9 @@
         }
     },
     watch: {
-
+        is_loading: function(newVal, oldVal) {
+            this.loading = newVal
+        }
     },
     data() {
         return {
@@ -132,15 +134,13 @@
             matchType: ["and", "or "],
             addColumn: "",
             stringOperators: ["equals", "contains", "begin with", "end with", "is empty", "is not empty"],
-            numberOperators: ["equals", "greater than", "less than", "less and equal than", "greater and equal than"]
+            numberOperators: ["equals", "greater than", "less than", "less and equal than", "greater and equal than"],
+            loading: false
         }
     }
   }
 </script>
 <style>
-    .el-select .el-input {
-    width: 130px;
-  }
   .input-with-select .el-input-group__prepend {
     background-color: #fff;
   }
