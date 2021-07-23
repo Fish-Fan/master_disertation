@@ -4,7 +4,7 @@
         <u-table
           v-if="isGroupby"
           v-loading="loading"
-          ref="plTable"
+          ref="multiheaders_table"
           :cell-class-name="cellClassNameFunc"
           :data="tableData"
           use-virtual
@@ -13,19 +13,21 @@
           :fit="true"
           :show-header="true"
           border>
-          <u-table-column label="index">
+          <u-table-column label="index" :key="Math.random()">
                 <u-table-column
                      v-for="item in indexes"
                      :prop="item.prop"
                      :label="item.label"
+                     :key="Math.random()"
                      :index="item.index">
                 </u-table-column>
           </u-table-column>
-          <u-table-column label="columns">
+          <u-table-column label="columns" :key="Math.random()">
                 <u-table-column
                      v-for="item in columns"
                      :prop="item.prop"
                      :label="item.label"
+                     :key="Math.random()"
                      :index="item.index">
                 </u-table-column>
           </u-table-column>
@@ -34,7 +36,7 @@
         <u-table
           v-else
           v-loading="loading"
-          ref="plTable"
+          ref="simple_table"
           :cell-class-name="cellClassNameFunc"
           :data="tableData"
           use-virtual
@@ -47,7 +49,9 @@
              v-for="item in headers"
              :prop="item.prop"
              :label="item.label"
-             :index="item.index"/>
+             :key="Math.random()"
+             :index="item.index">
+            </u-table-column>
         </u-table>
     </el-tab-pane>
   </el-tabs>
@@ -74,8 +78,14 @@
         },
         methods: {
           cellClassNameFunc({row, column, rowIndex, columnIndex}) {
-            if (columnIndex == this.highlight_columns) {
-              return 'warning-row'
+            if (this.isGroupby) {
+                if (columnIndex - this.indexes.length == this.highlight_columns) {
+                    return 'warning-row'
+                }
+            } else {
+                if (columnIndex == this.highlight_columns) {
+                    return 'warning-row'
+                }
             }
           }
         },

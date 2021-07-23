@@ -43,7 +43,7 @@
                 <el-button size="mini" icon="el-icon-remove" @click="handleRemoveButton(index)"></el-button>
             </div>
             <el-input v-else v-model="column.value" class="input-with-select" size="mini" :disabled="column.disabled">
-                <el-select v-if="column.type.includes('int') || column.type.includes('float')" v-model="column.operator" placeholder="select" size="mini" slot="prepend" @change="operatorChange(column)">
+                <el-select style="width: 150px" v-if="column.type.includes('int') || column.type.includes('float')" v-model="column.operator" placeholder="select" size="mini" slot="prepend" @change="operatorChange(column)">
                     <el-option
                       v-for="(operator, index) in numberOperators"
                       :key="index"
@@ -51,7 +51,7 @@
                       :value="operator">
                     </el-option>
                 </el-select>
-                <el-select v-else v-model="column.operator" placeholder="select" size="mini" slot="prepend" @change="operatorChange(column)">
+                <el-select style="width: 150px" v-else v-model="column.operator" placeholder="select" size="mini" slot="prepend" @change="operatorChange(column)">
                     <el-option
                       v-for="(operator, index) in stringOperators"
                       :key="index"

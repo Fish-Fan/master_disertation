@@ -12,6 +12,7 @@ from ..util.DataFrameConverter import DataFrameConverter
 from ..guidance.Guidance import Guidance
 from app.util.ColumnFormatHelper import ColumnFormatHelper
 import jsons
+import pandas as pd
 import sys, traceback
 
 
@@ -66,7 +67,7 @@ def generateworkflow():
 @inquery.route('/getdataset', methods=['GET', 'POST'])
 def getDemodataset():
     filenames = session['filenames']
-    dfc = DataFrameConverter(df=None, source=DATASET_PATH + filenames)
+    dfc = DataFrameConverter(None, DATASET_PATH + filenames)
     return dfc.doConvert(session['column_type_dict'])
 
 @inquery.route('/column_profiling', methods=['GET', 'POST'])
@@ -75,7 +76,7 @@ def columnProfiling():
     filenames = session['filenames']
     pf = None
     if 'preview_df' in session and session.get('preview_df'):
-        pf = Profiling_util(filenames, data_frame=session.get('preview_df'))
+        pf = Profiling_util(None, data_frame=pd.DataFrame.from_dict(session.get('preview_df')))
     else:
         pf = Profiling_util(DATASET_PATH + filenames)
     ans = pf.getColumnProfiling(column, session['column_type_dict'])

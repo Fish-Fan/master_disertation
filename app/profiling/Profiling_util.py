@@ -14,10 +14,10 @@ REPORT_HTML_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), repo
 class Profiling_util:
     def __init__(self, source, data_frame=None):
         self.source = source
-        if data_frame:
-            self.df = pd.DataFrame(data_frame)
-        else:
+        if source:
             self.df = pd.read_csv(self.source)
+        else:
+            self.df = data_frame
 
     def getColumns(self):
         dataset = self.df.copy()

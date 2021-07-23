@@ -81,17 +81,26 @@ class FillMissingValuePreparator(Preparator):
         markResList = []
 
         for column, score in d.items():
-            column_obj = self.columnIndexMap.get(column)
-            column_type = column_obj['type']
-            data = {}
-            column_util = ColumnUtil(df[column])
-            if column_type == 'object':
-                guess_result = column_util.guessColumnType()
-                data = self._construct_column_data_(guess_result.get('type'), guess_result.get('matchValues'), column_util)
+            # process empty column
+            if len(list(df[column].dropna())) == 0:
+                data = {'fillWay': "manual"}
             else:
-                h = column_util.getColumnTypeHistogram(type=column_type)
-                if not h:
-                    data = self._construct_column_data_(column_type, h.get(column_type)['raw_data'], column_util)
+                column_obj = self.columnIndexMap.get(column)
+                column_type = column_obj['type']
+                data = {}
+                column_util = ColumnUtil(df[column])
+                if column_type == 'object':
+                    guess_result = column_util.guessColumnType()
+                    data = self._construct_column_data_(guess_result.get('type'), guess_result.get('matchValues'),
+                                                        column_util)
+                else:
+                    if column_obj['set_by_manual']:
+                        h = column_util.getColumnTypeHistogram(type=column_type)
+                        if not h:
+                            data = self._construct_column_data_(column_type, h.get(column_type)['raw_data'],
+                                                                column_util)
+                    else:
+                        data = self._construct_column_data_(column_type, list(df[column].dropna()), column_util)
             markResList.append(MarkingResult(score, column, self.columnIndexMap.get(column)['index'], data))
         return markResList
 
