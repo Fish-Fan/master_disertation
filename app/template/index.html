@@ -142,6 +142,13 @@
                                             Groupby
                                         </a>
                                     </li>
+                                    <li role="presentation" style="color: #589df8">
+                                        <a href="#multipleFileWrangling" aria-controls="multipleFileWrangling" role="tab" data-toggle="tab">
+                                            <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
+                                            <br>
+                                            multipleFileWrangling
+                                        </a>
+                                    </li>
                                   </ul>
 
                                   <!-- Tab panes -->
@@ -210,6 +217,15 @@
                                                 v-on:group-by-recipe-event="handleRecipeEvent"
                                                 :is_loading="is_loading"
                                                 :column_list="columnList"></group-by>
+                                        </div>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane" id="multipleFileWrangling">
+                                        <div class="form-group">
+                                            <multiple-file-wrangling
+                                                v-on:concat-recipe-event="handleRecipeEvent"
+                                                v-on:join-recipe-event="handleRecipeEvent"
+                                                :is_loading="is_loading"
+                                                :column_list="columnList"></multiple-file-wrangling>
                                         </div>
                                     </div>
                                   </div>

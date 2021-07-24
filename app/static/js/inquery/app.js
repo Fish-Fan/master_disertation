@@ -96,8 +96,8 @@ new window.Vue({
         'change-column-type-group': window.httpVueLoader("/static/js/components/changeColumnType.vue"),
         'stringRule': window.httpVueLoader("/static/js/components/stringRule.vue"),
         'query-builder-group': window.httpVueLoader("/static/js/components/queryBuilderGroup.vue"),
-        'group-by': window.httpVueLoader("/static/js/components/groupby.vue")
-
+        'group-by': window.httpVueLoader("/static/js/components/groupby.vue"),
+        'multiple-file-wrangling': window.httpVueLoader("/static/js/components/multipleFileWrangling.vue")
 
     },
     delimiters: ["${","}"]

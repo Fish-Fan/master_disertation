@@ -6,11 +6,13 @@ from app.util.DataFrameConverter import DataFrameConverter
 from flask import session
 from app.util.ColumnFormatHelper import ColumnFormatHelper
 from app.guidance.Guidance import Guidance
+from collections import OrderedDict
 
 class PreviewUtil():
-    def __init__(self, source):
+    def __init__(self, source, data_path):
         self.source = source
         self.df = pd.read_csv(source)
+        self.data_path = data_path
 
 
     def getPreviewJson(self, param, session):
@@ -30,6 +32,10 @@ class PreviewUtil():
                 self._process_query_bulider_operator_(step['data'])
             elif step['type'] == 'groupby':
                 is_group_by = self._process_groupby_operator_(step['data'])
+            elif step['type'] == 'concat':
+                self._process_concat_operator_(step['data'], session)
+            elif step['type'] == 'join':
+                self._process_join_operator_(step['data'], session)
 
         ans = {}
         # update column type before doing analysis
@@ -153,7 +159,34 @@ class PreviewUtil():
 
         return True
 
+    def _process_concat_operator_(self, concatParam, session):
+        new_column_name_list = concatParam
+        new_wrangling_df = self._get_new_df_from_session_(session)
 
+        # iterate new_column_name_list and rename its column, prepare for concatenation
+        cfh = ColumnFormatHelper(None, data_frame=new_wrangling_df)
+        format_dict = cfh.get_original_data_format()
+        for new_column_obj in new_column_name_list:
+            origin_name = new_column_obj['origin_name']
+            new_name = new_column_obj['new_name']
+            format_dict[new_name] = format_dict.pop(origin_name)
+
+        d = OrderedDict(sorted(format_dict.items(), key=lambda t: t[1]['index']))
+
+        # do change column name
+        new_wrangling_df.columns = d.keys()
+        self.df = pd.concat([self.df, new_wrangling_df], ignore_index=True, sort=False)
+
+    def _process_join_operator_(self, joinParam, session):
+        new_wrangling_df = self._get_new_df_from_session_(session)
+        left_on = joinParam['left_on']
+        right_on = joinParam['right_on']
+        self.df = pd.merge(self.df, new_wrangling_df, how="left", left_on=left_on, right_on=right_on)
+
+
+    def _get_new_df_from_session_(self, session):
+        new_wrangling_file_name = session['wrangling_files'][-1]
+        return pd.read_csv(self.data_path + new_wrangling_file_name)
 
 if __name__ == '__main__':
     pu = PreviewUtil('../dataset/new_uk_500.csv')

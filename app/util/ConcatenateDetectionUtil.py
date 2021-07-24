@@ -20,17 +20,17 @@ class ConcatenateDetectionUtil:
 
     def marking(self):
         # remove non string columns
-        self.drop_non_string_columns()
+        self._drop_non_string_columns_()
         # trying to match columns
-        self.match_columns()
+        return self._match_columns_()
 
-    def match_columns(self):
-        pattern_df1 = self.extract_patterns_for_each_column(self.df1)
-        pattern_df2 = self.extract_patterns_for_each_column(self.df2)
+    def _match_columns_(self):
+        pattern_df1 = self._extract_patterns_for_each_column_(self.df1)
+        pattern_df2 = self._extract_patterns_for_each_column_(self.df2)
 
         # pre-process percentage list
-        self.pre_process_percentage(pattern_df1)
-        self.pre_process_percentage(pattern_df2)
+        self._pre_process_percentage_(pattern_df1)
+        self._pre_process_percentage_(pattern_df2)
 
         matched_column_result = {}
 
@@ -38,16 +38,17 @@ class ConcatenateDetectionUtil:
         for column_name, column_profiling_result in pattern_df1.items():
 
             pattern_percentage_list = column_profiling_result['patterns_percentage']
-            self.computeScoresForEachColumn(tuple_marking_result_dict, pattern_percentage_list, pattern_df2, column_name)
+            self._computeScoresForEachColumn_(tuple_marking_result_dict, pattern_percentage_list, pattern_df2, column_name)
 
         # remove duplicate in tuple_marking_result_dict
-        tuple_marking_result_dict = self.remove_duplicate_in_tuple_marking_result_dict(tuple_marking_result_dict)
+        tuple_marking_result_dict = self._remove_duplicate_in_tuple_marking_result_dict_(tuple_marking_result_dict)
         # compute each tuple score
-        tuple_marking_result_dict = self.compute_tuple_score(tuple_marking_result_dict)
+        tuple_marking_result_dict = self._compute_tuple_score_(tuple_marking_result_dict)
         # get the best matched column
-        best_matched_result_with_score = self.get_best_matched_column(tuple_marking_result_dict)
-        print('111')
-    def get_best_matched_column(self, tuple_marking_result_dict):
+        best_matched_result_with_score = self._get_best_matched_column_(tuple_marking_result_dict)
+        return best_matched_result_with_score
+
+    def _get_best_matched_column_(self, tuple_marking_result_dict):
         # split via first tuple value
         ans = {}
         for columns_tuple, score in tuple_marking_result_dict.items():
@@ -63,13 +64,13 @@ class ConcatenateDetectionUtil:
 
 
 
-    def compute_tuple_score(self, tuple_marking_result_dict):
+    def _compute_tuple_score_(self, tuple_marking_result_dict):
         ans = {}
         for columns_tuple, score_arr in tuple_marking_result_dict.items():
             ans[columns_tuple] = sum(score_arr)
         return ans
 
-    def remove_duplicate_in_tuple_marking_result_dict(self, tuple_marking_result_dict):
+    def _remove_duplicate_in_tuple_marking_result_dict_(self, tuple_marking_result_dict):
         ans = {}
         for columns_tuple, score_arr in tuple_marking_result_dict.items():
             t1, t2 = columns_tuple, (columns_tuple[1], columns_tuple[0])
@@ -77,7 +78,7 @@ class ConcatenateDetectionUtil:
                 ans[t1] = score_arr
         return ans
 
-    def pre_process_percentage(self, pattern_df):
+    def _pre_process_percentage_(self, pattern_df):
         for column_name, column_profiling_result in pattern_df.items():
             pattern_percentage_list = column_profiling_result['patterns_percentage']
             total_percentage = 0
@@ -87,7 +88,7 @@ class ConcatenateDetectionUtil:
             for pattern_percentage in pattern_percentage_list:
                 pattern_percentage['percentage'] = pattern_percentage['percentage'] / total_percentage * 100
 
-    def computeScoresForEachColumn(self, tuple_marking_result_dict, pattern_percentage_list_1, pattern_df2, column_name_1):
+    def _computeScoresForEachColumn_(self, tuple_marking_result_dict, pattern_percentage_list_1, pattern_df2, column_name_1):
 
         for i, pattern_percentage_item_1 in enumerate(pattern_percentage_list_1):
             pattern_1 = pattern_percentage_item_1['pattern']
@@ -103,7 +104,7 @@ class ConcatenateDetectionUtil:
 
 
 
-    def drop_non_string_columns(self):
+    def _drop_non_string_columns_(self):
         cfh = ColumnFormatHelper(None, data_frame=self.df1)
         format_df1 = cfh.get_original_data_format()
         cfh = ColumnFormatHelper(None, data_frame=self.df2)
@@ -127,7 +128,7 @@ class ConcatenateDetectionUtil:
         self.df1 = self.df1.drop(non_string_columns_df1, axis=1)
         self.df2 = self.df2.drop(non_string_columns_df2, axis=1)
 
-    def extract_patterns_for_each_column(self, df):
+    def _extract_patterns_for_each_column_(self, df):
         column_names = list(df.columns)
         ans = {}
         for column_name in column_names:
@@ -147,4 +148,4 @@ if __name__ == '__main__':
     df2 = pd.read_csv('../dataset/City.csv')
 
     cdu = ConcatenateDetectionUtil(df1, df2)
-    cdu.marking()
+    ans = cdu.marking()

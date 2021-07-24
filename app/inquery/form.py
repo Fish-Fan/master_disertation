@@ -10,6 +10,7 @@ from ..util.WorkflowGenerator import WorkflowGenerator
 from ..util.PreviewUtil import PreviewUtil
 from ..util.DataFrameConverter import DataFrameConverter
 from ..guidance.Guidance import Guidance
+from app.guidance.MultipleFileGuidance import MultipleFileGuidance
 from app.util.ColumnFormatHelper import ColumnFormatHelper
 import jsons
 import pandas as pd
@@ -32,6 +33,7 @@ def receiveDataset():
     filenames = request.get_json()['filenames']
     session.pop('filenames', None)
     session.pop('preview_df', None)
+    session.pop('wrangling_files', None)
     session['filenames'] = filenames
     session.modified = True
     return "success"
@@ -85,7 +87,7 @@ def columnProfiling():
 @inquery.route('/preview', methods=['GET', 'POST'])
 def preview():
     filenames = session['filenames']
-    pu = PreviewUtil(DATASET_PATH + filenames)
+    pu = PreviewUtil(DATASET_PATH + filenames, DATASET_PATH)
     try:
         tmp = pu.getPreviewJson(request.get_json(), session)
         session['preview_df'] = pu.df.to_dict()
@@ -94,4 +96,19 @@ def preview():
         traceback.print_exc(file=sys.stdout)
         return jsonify({'code': 500, 'message': 'preview failure'}), 200, {'ContentType': 'application/json'}
 
+@inquery.route('/multiple_file_wrangling', methods=['GET', 'POST'])
+def multipleFileWrangling():
+    another_file_name = request.get_json()['dataset_submit']
+    # store every new wrangling file into session
+    if 'wrangling_files' in session:
+        session['wrangling_files'].append(another_file_name)
+    else:
+        session['wrangling_files'] = [another_file_name]
+    # call multiple guidance do analysis
+    mfg = ""
+    if 'preview_df' in session and session.get('preview_df'):
+        mfg = MultipleFileGuidance(pd.DataFrame.from_dict(session.get('preview_df')), None, data_source_2=DATASET_PATH + another_file_name)
+    else:
+        mfg = MultipleFileGuidance(None, None, data_source_1=DATASET_PATH + session.get('filenames'), data_source_2=DATASET_PATH + another_file_name)
 
+    return jsons.dumps(mfg.analysis())
