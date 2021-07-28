@@ -415,6 +415,8 @@ define(["model/flow", "util", 'socket'], function(Flow, Util, Socket) {
                     dataType: 'json'
                 }).always(function (data) {
                     $('#inquery-modal').modal();
+                    /*force refresh vue component*/
+                    vm.$emit('refresh', 10);
                 });
             });
         });

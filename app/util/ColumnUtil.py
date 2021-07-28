@@ -54,7 +54,7 @@ class ColumnUtil:
         if len(self.column_df) > 0:
             category_count = len(self.column_df.value_counts().keys())
             value_count = len(self.column_df)
-            if category_count / value_count <= 0.01:
+            if 1 - category_count / value_count >= 0.9:
                 # empty string ans
                 d['category'] = d['string']
                 d['string'] = []

@@ -143,6 +143,8 @@
             if (newVal.length > 0) {
                 this.submitSplitColumns = this.computeSubmitSplitColumns(newVal);
                 this.activeTab = newVal[0].column;
+            } else {
+                this.submitSplitColumns = [];
             }
         },
         is_loading: function(newVal, oldVal) {

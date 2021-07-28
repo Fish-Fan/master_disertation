@@ -76,31 +76,32 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="gridSystemModalLabel">Modal title</h4>
+            <h4 class="modal-title" id="gridSystemModalLabel">Data Wrangling Guidance Application</h4>
           </div>
           <div class="modal-body">
             <div class="row">
                 <div class="col-md-8" id="pandas-profiling-result">
                   <div class="row">
                       <div class="col-md-12">
+                          <profiling-column
+                                        v-on:column-profiling-result="handleColumnProfilingResult"
+                                        v-on:highlight-columns-changed="handleHighlightColumnsChanged"
+                                        :is_loading="is_loading"
+                                        :column_list="columnList"></profiling-column>
+                      </div>
+                      <div class="col-md-12">
                           <display-table
+                                      :key="refresh_key"
                                       :is_loading="is_loading"
                                       :preview_dataset="previewDataset"
                                       :highlight_columns="highlightColumnIndexes"></display-table>
                       </div>
-                      <div class="col-md-12" style="position: relative; height: 250px; width: 100%;overflow-y: scroll">
+                      <div class="col-md-12" style="position: relative; height: 280px; width: 100%;overflow-y: scroll">
                           <form action="/generateworkflow" id="inquery-form">
                               <div>
                                   <!-- Nav tabs -->
                                   <ul class="nav nav-tabs" role="tablist">
-                                    <li role="presentation" class="active" style="color: #589df8">
-                                        <a href="#Profile" aria-controls="Profile" role="tab" data-toggle="tab">
-                                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                                            <br>
-                                            Profile
-                                        </a>
-                                    </li>
-                                    <li role="presentation" style="color: #589df8">
+                                    <li role="presentation" style="color: #589df8" class="active">
                                         <a href="#Delete" aria-controls="Delete" role="tab" data-toggle="tab">
                                             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                             <br>
@@ -149,25 +150,22 @@
                                             multipleFileWrangling
                                         </a>
                                     </li>
+                                    <li role="presentation" style="color: #589df8">
+                                        <a href="#chart" aria-controls="chart" role="tab" data-toggle="tab">
+                                            <span class="glyphicon glyphicon-signal" aria-hidden="true"></span>
+                                            <br>
+                                            chart
+                                        </a>
+                                    </li>
                                   </ul>
 
                                   <!-- Tab panes -->
                                   <div class="tab-content">
-                                    <div role="tabpanel" class="tab-pane active" id="Profile">
-                                         <div class="form-group">
-                                            <label>profiling for each columns:</label>
-                                            <profiling-column
-                                                v-on:column-profiling-result="handleColumnProfilingResult"
-                                                v-on:highlight-columns-changed="handleHighlightColumnsChanged"
-                                                :is_loading="is_loading"
-                                                :column_list="columnList"></profiling-column>
-                                        </div>
-                                    </div>
-                                    <div role="tabpanel" class="tab-pane" id="Delete">
+                                    <div role="tabpanel" class="tab-pane active" id="Delete">
                                         <div class="form-group">
-                                            <label>suggestions for deleting columns:</label>
                                             <delete-column-group
                                                 v-on:delete-recipe-event="handleRecipeEvent"
+                                                :key="refresh_key"
                                                 :column_list="columnList"
                                                 :delete_list="deleteColumns"
                                                 :is_loading="is_loading"
@@ -176,25 +174,24 @@
                                     </div>
                                     <div role="tabpanel" class="tab-pane" id="Fill">
                                         <div class="form-group">
-                                            <label>suggestions for fill missing value columns: </label>
                                             <filling-missing-value-group
                                                 v-on:fill-missing-value-recipe-event="handleRecipeEvent"
+                                                :key="refresh_key"
                                                 :is_loading="is_loading"
                                                 :column_list="fillMissingColumns"></filling-missing-value-group>
                                         </div>
                                     </div>
                                     <div role="tabpanel" class="tab-pane" id="Split">
                                          <div class="form-group">
-                                            <label>suggestions for splitting columns: </label>
                                             <splitting-column-group
                                                 v-on:split-column-value-recipe-event="handleRecipeEvent"
                                                 :is_loading="is_loading"
+                                                :key="refresh_key"
                                                 :column_list="splitColumns"></splitting-column-group>
                                         </div>
                                     </div>
                                     <div role="tabpanel" class="tab-pane" id="Format">
                                          <div class="form-group">
-                                            <label>suggestions for changing column's type: </label>
                                              <change-column-type-group
                                                 v-on:change-column-type-event="handleRecipeEvent"
                                                 :is_loading="is_loading"
@@ -203,18 +200,18 @@
                                     </div>
                                     <div role="tabpanel" class="tab-pane" id="Filter">
                                         <div class="form-group">
-                                            <label>Would like to add some filters? </label>
                                             <query-builder-group
                                                 v-on:query-builder-recipe-event="handleRecipeEvent"
                                                 :is_loading="is_loading"
+                                                :key="refresh_key"
                                                 :column_list="columnList"></query-builder-group>
                                         </div>
                                     </div>
                                     <div role="tabpanel" class="tab-pane" id="groupby">
                                         <div class="form-group">
-                                            <label>Fancy groupby feature?</label>
                                             <group-by
                                                 v-on:group-by-recipe-event="handleRecipeEvent"
+                                                :key="refresh_key"
                                                 :is_loading="is_loading"
                                                 :column_list="columnList"></group-by>
                                         </div>
@@ -224,8 +221,18 @@
                                             <multiple-file-wrangling
                                                 v-on:concat-recipe-event="handleRecipeEvent"
                                                 v-on:join-recipe-event="handleRecipeEvent"
+                                                :key="refresh_key"
                                                 :is_loading="is_loading"
                                                 :column_list="columnList"></multiple-file-wrangling>
+                                        </div>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane" id="chart">
+                                        <div class="form-group">
+                                            <chart
+                                                v-on:concat-recipe-event="handleRecipeEvent"
+                                                v-on:join-recipe-event="handleRecipeEvent"
+                                                :is_loading="is_loading"
+                                                :column_list="columnList"></chart>
                                         </div>
                                     </div>
                                   </div>
@@ -234,11 +241,7 @@
 
 
 
-                              <preview-and-add-recipe-group
-                                      v-on:preview-dataset-changed="handlePreviewDatasetChanged"
-                                      v-on:is-loading-event="handleIsLoadingEvent"
-                                      :recipe_list="recipeList"
-                              ></preview-and-add-recipe-group>
+
                   </form>
                       </div>
                   </div>
@@ -248,6 +251,7 @@
                   <column-status-panel :column_profiling_result="columnProfilingResult"></column-status-panel>
                           <recipe
                                   v-on:remove-recipe-item-event="handleRemoveRecipeItemEvent"
+                                  :key="refresh_key"
                                   :recipe_list="recipeList"></recipe>
 
 
@@ -255,8 +259,14 @@
             </div>
           </div>
           <div class="modal-footer" id="inquery-form-footer">
-            <button class="btn btn-primary" style="float: left" @click="profiling">profiling</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <modal-footer
+                  v-on:is-loading-event="handleIsLoadingEvent"
+                  v-on:preview-dataset-changed="handlePreviewDatasetChanged"
+                  v-on:is-loading-event="handleIsLoadingEvent"
+                  v-on:profiling-event="handleProfilingEvent"
+                  v-on:get-data-set-event="handleGetDatasetEvent"
+                  :key="refresh_key"
+                  :recipe_list="recipeList"></modal-footer>
           </div>
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
@@ -266,17 +276,30 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://unpkg.com/vue"></script>
-    <script src="https://unpkg.com/http-vue-loader"></script>
-    <!-- import CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <!-- import JavaScript -->
-    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-    <!--import umy ui-->
-      <script src="https://unpkg.com/umy-ui/lib/index.js"></script>
+<!--    <script src="https://unpkg.com/vue"></script>-->
+<!--    <script src="https://unpkg.com/http-vue-loader"></script>-->
+<!--    &lt;!&ndash; import CSS &ndash;&gt;-->
+<!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+<!--    &lt;!&ndash; import JavaScript &ndash;&gt;-->
+<!--    <script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
+<!--    &lt;!&ndash;language package&ndash;&gt;-->
+<!--    <script src="https://unpkg.com/element-ui/lib/umd/locale/en.js"></script>-->
+<!--    &lt;!&ndash;import umy ui&ndash;&gt;-->
+<!--      <script src="https://unpkg.com/umy-ui/lib/index.js"></script>-->
+
+    <script type="text/javascript" src="{{ url_for('static', filename='vue/vue.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='vue/http-vue-loader.js') }}"></script>
+    <link href="{{ url_for('static', filename='element-ui/index.css') }}" rel="stylesheet">
+    <script type="text/javascript" src="{{ url_for('static', filename='element-ui/index.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='element-ui/en.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='element-ui/umy-ui.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='chart/chart.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='chart/vue-chartjs.min.js') }}"></script>
+
+
 
     <script src="{{ url_for('static', filename='js/inquery/app.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='vue/vue-resource.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='node_modules/x-editable/dist/bootstrap3-editable/js/bootstrap-editable.min.js') }}"></script>
@@ -287,6 +310,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='node_modules/jsplumb/dist/js/jsplumb.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='node_modules/socketio/socket.io.js') }}" crossorigin="anonymous"></script>
     <script type="text/javascript" charset="utf-8">
+      ELEMENT.locale(ELEMENT.lang.en);
       var socket = io();
       socket.on('connect', function() {
           socket.emit('myemit', {data: 'I\'m connected!'});

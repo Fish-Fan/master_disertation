@@ -109,8 +109,15 @@
         addRule () {
             for (column_item of this.column_list) {
                 if (this.addColumn == column_item.name) {
-                    column_item.disabled = false;
-                    this.query.filterList.push(column_item);
+                    var new_column_item = {};
+                    new_column_item.disabled = false;
+                    new_column_item.index = column_item.index;
+                    new_column_item.name = column_item.name;
+                    new_column_item.operators = column_item.operators;
+                    new_column_item.set_by_manual = column_item.set_by_manual;
+                    new_column_item.type = column_item.type;
+                    new_column_item.value = "";
+                    this.query.filterList.push(new_column_item);
                 }
             }
         },

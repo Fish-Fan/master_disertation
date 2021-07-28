@@ -2,7 +2,7 @@
   <el-form ref="form" v-loading="loading">
         <label>choose your splitter</label>
         <el-form-item>
-            <el-select class="splitter" v-model="spilitter_submit" multiple placeholder="select" size="mini">
+            <el-select class="splitter" v-model="spilitter_submit" multiple :placeholder="computePlaceholderForSplitter(category_columns)" size="mini">
                 <el-option
                   v-for="(option, index) in category_columns"
                   :key="index"
@@ -17,7 +17,7 @@
             <div v-for="(column_aggregation_func, column_aggregation_func_index) in column_aggregation_funcs_submit">
                 <el-select class="column_aggregation" v-model="column_aggregation_func.column" placeholder="select" size="mini">
                     <el-option
-                      v-for="(column, index) in numeric_columns"
+                      v-for="(column, index) in column_list"
                       :key="index"
                       :label="column.name"
                       :value="column.name">
@@ -25,7 +25,7 @@
                 </el-select>
                 <el-select class="column_aggregation" v-model="column_aggregation_func.aggre_funcs" multiple placeholder="select" size="mini">
                     <el-option
-                      v-for="(function_name, index) in aggregation_functions"
+                      v-for="(function_name, index) in computeAggregationFuncs(column_aggregation_func.column)"
                       :key="index"
                       :label="function_name"
                       :value="function_name">
@@ -43,6 +43,28 @@
   module.exports = {
     props: ['column_list', 'is_loading'],
     methods: {
+        computePlaceholderForSplitter(category_columns) {
+            if (category_columns.length > 0) {
+                return 'select'
+            } else {
+                return 'Only category column can be used as a splitter'
+            }
+        },
+        computeAggregationFuncs(column_name) {
+            if (this.isNumericColumn(column_name)) {
+                return ['max', 'min', 'mean', 'sum', 'count', 'count(distinct)']
+            } else {
+                return ['count', 'count(distinct)']
+            }
+        },
+        isNumericColumn(column_name) {
+            for (numeric_column_obj of this.numeric_columns) {
+                if (numeric_column_obj.name == column_name) {
+                    return true;
+                }
+            }
+            return false;
+        },
         computeNumericAndCategoryColumns(column_list) {
             var numeric_arr = [];
             var category_arr = [];
@@ -67,10 +89,10 @@
             this.column_aggregation_funcs_submit.splice(index, 1);
         },
         concatRecipeDescription(splitter_columns, column_aggregations) {
-            var split_desc = "splitting data into groups via " + splitter_columns.toString() + " ";
+            var split_desc = "splitting data into groups via [" + splitter_columns.toString() + "] ";
             var group_desc = "";
             for (column_aggregation_item of column_aggregations) {
-                group_desc += "group by " + column_aggregation_item.column + " via using " + column_aggregation_item.aggre_funcs.toString() + " functions; "
+                group_desc += "apply aggregation functions [" + column_aggregation_item.aggre_funcs.toString() + "] on " + column_aggregation_item.column + " column; "
             }
             return split_desc + group_desc;
         },
@@ -100,7 +122,7 @@
             column_aggregation_funcs_submit: [],
             numeric_columns: [],
             category_columns: [],
-            aggregation_functions: ['max', 'min', 'mean', 'sum'],
+            aggregation_functions: ['max', 'min', 'mean', 'sum', 'count'],
             loading: false
         }
     }

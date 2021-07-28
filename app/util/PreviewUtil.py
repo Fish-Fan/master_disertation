@@ -11,8 +11,12 @@ from collections import OrderedDict
 class PreviewUtil():
     def __init__(self, source, data_path):
         self.source = source
+        self.source_name = source.split('/')[-1][:-4]
         self.df = pd.read_csv(source)
         self.data_path = data_path
+        # for multiple files data wrangling use
+        self.wrangling_index = 0
+
 
 
     def getPreviewJson(self, param, session):
@@ -127,11 +131,11 @@ class PreviewUtil():
                 expression += expression_num_pattern.format(filter_item['name'], '<=', filter_item['value'], match_type)
             elif filter_item['operator'] == 'greater and equal than':
                 expression += expression_num_pattern.format(filter_item['name'], '>=', filter_item['value'], match_type)
-
+        # TODO hard code join type, should be flexible in later version
         if match_type == 'and':
+            expression = expression[:len(expression)-5]
+        else:
             expression = expression[:len(expression)-4]
-        elif match_type == 'or':
-            expression = expression[:len(expression)-3]
 
         num_columns = []
         for filter_item in filter_list:
@@ -147,22 +151,30 @@ class PreviewUtil():
 
         agg_dict = {}
         for column_aggregation_item in column_aggregations:
-            agg_dict[column_aggregation_item['column']] = column_aggregation_item['aggre_funcs']
+            # identify count(distinct)
+            if 'count(distinct)' in column_aggregation_item['aggre_funcs']:
+                agg_dict[column_aggregation_item['column']] = [pd.Series.nunique if x == 'count(distinct)' else x for x in column_aggregation_item['aggre_funcs']]
+            else:
+                agg_dict[column_aggregation_item['column']] = column_aggregation_item['aggre_funcs']
 
         self.df = self.df.groupby(splitters).agg(agg_dict)
 
         new_column_names = []
         for column_name, aggregation_funcs in agg_dict.items():
             for aggregation_func_name in aggregation_funcs:
-                new_column_names.append('{}_{}'.format(column_name, aggregation_func_name))
+                if aggregation_func_name == pd.Series.nunique:
+                    new_column_names.append('{}_{}'.format(column_name, 'count(distinct)'))
+                else:
+                    new_column_names.append('{}_{}'.format(column_name, aggregation_func_name))
         self.df.columns = new_column_names
 
         return True
 
     def _process_concat_operator_(self, concatParam, session):
         new_column_name_list = concatParam
-        new_wrangling_df = self._get_new_df_from_session_(session)
-
+        new_df_obj = self._get_new_df_from_session_(session)
+        new_wrangling_df = new_df_obj['data_frame']
+        new_wrangling_file_name = new_df_obj['file_name']
         # iterate new_column_name_list and rename its column, prepare for concatenation
         cfh = ColumnFormatHelper(None, data_frame=new_wrangling_df)
         format_dict = cfh.get_original_data_format()
@@ -178,15 +190,23 @@ class PreviewUtil():
         self.df = pd.concat([self.df, new_wrangling_df], ignore_index=True, sort=False)
 
     def _process_join_operator_(self, joinParam, session):
-        new_wrangling_df = self._get_new_df_from_session_(session)
+        new_df_obj = self._get_new_df_from_session_(session)
+        new_wrangling_df = new_df_obj['data_frame']
+        left_dataset_name = self.source_name
+        right_dataset_name = new_df_obj['file_name']
         left_on = joinParam['left_on']
         right_on = joinParam['right_on']
-        self.df = pd.merge(self.df, new_wrangling_df, how="left", left_on=left_on, right_on=right_on)
+        self.df = pd.merge(self.df, new_wrangling_df, how="left", left_on=left_on, right_on=right_on, suffixes=('' , '_' + right_dataset_name))
 
 
     def _get_new_df_from_session_(self, session):
-        new_wrangling_file_name = session['wrangling_files'][-1]
-        return pd.read_csv(self.data_path + new_wrangling_file_name)
+        new_wrangling_file_name = session['wrangling_files'][self.wrangling_index]
+        ans =  {
+            'data_frame': pd.read_csv(self.data_path + new_wrangling_file_name),
+            'file_name': session['wrangling_files'][self.wrangling_index][:-4]
+        }
+        self.wrangling_index += 1
+        return ans
 
 if __name__ == '__main__':
     pu = PreviewUtil('../dataset/new_uk_500.csv')

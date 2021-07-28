@@ -1,6 +1,6 @@
 <template>
   <el-tabs value="View">
-    <el-tab-pane label="Data Preview" name="View" style="height: 450px; margin-bottom: 20px">
+    <el-tab-pane label="Data Preview" name="View" style="height: 300px; margin-bottom: 20px">
         <u-table
           v-if="isGroupby"
           v-loading="loading"
@@ -9,7 +9,7 @@
           :data="tableData"
           use-virtual
           size="mini"
-          max-height="450"
+          max-height="300"
           :fit="true"
           :show-header="true"
           border>
@@ -41,7 +41,7 @@
           :data="tableData"
           use-virtual
           size="mini"
-          max-height="450"
+          max-height="300"
           :fit="true"
           :show-header="true"
           border>
@@ -50,6 +50,7 @@
              :prop="item.prop"
              :label="item.label"
              :key="Math.random()"
+             :render-header="linefeed"
              :index="item.index">
             </u-table-column>
         </u-table>
@@ -77,6 +78,12 @@
             proxy: 'http://127.0.0.1:5000/'
         },
         methods: {
+          linefeed (h,{column,index}) {
+                let number = column.label.length;
+                let size = 10;
+                column.minWidth = number*size;
+                return h('div',{class:'table-head',style:{width:'80%'}},[column.label])
+            },
           cellClassNameFunc({row, column, rowIndex, columnIndex}) {
             if (this.isGroupby) {
                 if (columnIndex - this.indexes.length == this.highlight_columns) {
