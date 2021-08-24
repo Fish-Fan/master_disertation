@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict, OrderedDict
+from app.util.ConfigparserHelper import ConfigparserHelper
 
 class ColumnUtil:
     def __init__(self, column_df):
@@ -13,8 +14,10 @@ class ColumnUtil:
 
     def guessColumnType(self):
         column_type = {}
+        # get column histogram
         h = self.getColumnTypeHistogram()
         for type, matched_obj in h.items():
+            # check is over half of non-missing values
             if matched_obj['count'] > len(self.column_df) // 2:
                 column_type['type'] = type
                 column_type['matchValues'] = matched_obj['raw_data']
@@ -25,28 +28,36 @@ class ColumnUtil:
         return column_type
 
     def getColumnTypeHistogram(self, type=None):
-        regex_list = {'int': r'^-?\d+$', 'float': r'^[0-9]+[.]{1}[0-9]+$',
-                      'email': r'^([a-zA-Z0-9._-]+)@([a-zA-Z0-9]+).([a-zA-Z0-9]+)([.uk]*)$',
-                      'postal': r'^[A-Z]{1,2}[0-9]{1,2}[A-Z]?\s?[0-9][A-Z]{2}$'}
+        # read regx from configuration
+        ch = ConfigparserHelper()
+        regex_list = ch.getTransformationTypesAndSemanticRole()
         d = defaultdict(list)
-        # in case of NoneType occurrence
+        # initialise
         d['string'] = []
+        if type:
+            d[type] = []
+        # iterate value in this column
         for value in list(self.column_df):
+            # try to match value with designated type
             if type:
                 name, reg = type, regex_list.get(type)
                 if re.match(reg, str(value)):
                     d[name].append(value)
                 else:
-                    d['string'].append(value)
+                    d['string'].append(value) # degenerate to string
             else:
                 count = 0
+                # try to match each type or semantic role
                 for name, reg in regex_list.items():
                     if re.match(reg, str(value)):
                         d[name].append(value)
                         count += 1
+                # degenerate to string
                 if count == 0:
                     d['string'].append(value)
+        # check whether can upgrade to categorical column
         self._check_is_category_type_(d)
+        # construct return value
         d = self._construct_return_value_(d)
         return d
 

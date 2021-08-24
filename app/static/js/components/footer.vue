@@ -2,20 +2,97 @@
     <div style="float: left">
         <el-button size="mini" v-if="has_profiled_prop" type="primary" @click="preview">Preview</el-button>
         <el-button size="mini" v-else type="primary" @click="profiling">profiling</el-button>
+        <el-button size="mini" type="button" type="info" @click="handleExport">Export</el-button>
+        <el-button size="mini" type="button" type="info" @click="RecipeManagement">Manage Recipe</el-button>
         <el-button size="mini" type="button" type="info" data-dismiss="modal">Close</el-button>
+
+        <el-button size="mini" type="button" type="success" data-dismiss="modal" @click="SaveRecipe">Save</el-button>
+
+
+        <el-dialog
+              :append-to-body="true"
+              title="Purpose of this data wrangling task"
+              :visible="domainKnowledgeDialogVisible"
+              >
+
+              <el-form ref="form" :model="domainKnowledge">
+                    <p class="question_label">Need some guidance for generating a nice recipe in this data wrangling task?</p>
+                    <el-radio-group v-model="domainKnowledge.needGuidance" >
+                        <el-radio label="Yes" border>Yes</el-radio>
+                        <el-radio label="No" border>No, just continue my exploration process</el-radio>
+                      </el-radio-group>
+                    <div v-if="domainKnowledge.needGuidance == 'Yes'">
+                        <p class="question_label">Does this wrangling involve with single or multiple files?</p>
+                        <el-radio-group v-model="domainKnowledge.singleOrMultiple" >
+                            <el-radio label="Single" border>Single</el-radio>
+                            <el-radio label="Multiple" border>Multiple</el-radio>
+                          </el-radio-group>
+                        <p class="question_label">Is this dataset tidy enough without any clean operation? For example, discard some irrelevant columns and deal with missing values</p>
+                            <el-radio-group v-model="domainKnowledge.needClean" >
+                                <el-radio label="Yes" border>Yes</el-radio>
+                                <el-radio label="No" border>No</el-radio>
+                              </el-radio-group>
+                        <p class="question_label">Does every column meet its own semantic role requirement? For example, some headers are too vague that need to specify</p>
+                            <el-radio-group v-model="domainKnowledge.needSplit">
+                                <el-radio label="Yes" border>Yes</el-radio>
+                                <el-radio label="No" border>No</el-radio>
+                              </el-radio-group>
+                        <p class="question_label">Making a conclusion? Any aggregate functions want to apply?</p>
+                            <el-radio-group v-model="domainKnowledge.needAggregation">
+                                <el-radio label="Yes" border>Yes</el-radio>
+                                <el-radio label="No" border>No</el-radio>
+                              </el-radio-group>
+                    </div>
+              </el-form>
+
+              <span slot="footer" class="dialog-footer">
+                <el-button @click="domainKnowledgeDialogVisible = false">Cancel</el-button>
+                <el-button type="primary" @click="handleConfirmClick">Confirm</el-button>
+              </span>
+        </el-dialog>
+
+        <el-dialog
+              title="Recipe management"
+              :visible.sync="RecipeManagementDialogVisible"
+                style="text-align: left"
+              >
+            <u-table
+              :data="dbRecipeList"
+              :border="false"
+              style="width: 100%">
+              <template slot="empty">
+                    no recipe currently
+               </template>
+              <u-table-column
+                prop="name"
+                label="name"
+                width="360">
+              </u-table-column>
+              <u-table-column
+                prop="operation"
+                label="operation">
+                <template v-slot="scope">
+                    <el-button type="success" size="mini" @click="handleReuse(scope.row.value)">Reuse</el-button>
+                    <el-button type="danger" size="mini" @click="handleRemove(scope.row.name)">Remove</el-button>
+                </template>
+              </u-table-column>
+            </u-table>
+        </el-dialog>
+
     </div>
 </template>
 <script>
   module.exports = {
-    props: ['recipe_list'],
+    props: ['recipe_list', 'recipe_guidance_list'],
     devServer: {
         proxy: 'http://127.0.0.1:5000/'
     },
     methods: {
         async preview() {
             this.$emit('is-loading-event', true);
+            let submitRecipeList = this.getRecipe();
             this.$http.post('/preview', {
-                    recipe_list: this.recipe_list
+                    recipe_list: submitRecipeList
                 }).then(response => {
                     if (response.body.code == 500) {
                         this.$message.error(response.body.message);
@@ -23,11 +100,19 @@
                         this.$emit('preview-dataset-changed', response.body);
                     }
                     this.$emit('is-loading-event', false);
-            })
+                })
 
         },
         profiling(e) {
             e.preventDefault();
+            this.domainKnowledgeDialogVisible = true;
+        },
+        handleConfirmClick() {
+            if (this.domainKnowledge.needGuidance == "Yes") {
+                this.$http.post('/domain_knowledge_capture', {domain_knowledge: this.domainKnowledge}).then(response => {
+                    this.$emit('recipe-guidance-event', response.body)
+                });
+            }
             this.$emit('is-loading-event', true);
             this.has_profiled_prop = true;
             this.$http.post('/profiling', {}).then(response => {
@@ -37,12 +122,66 @@
 
             this.$http.get('/getdataset').then(response => {
                this.$emit('get-data-set-event', response.body)
-            })
+            });
+            this.domainKnowledgeDialogVisible = false
         },
+        handleExport() {
+            this.$emit('execute-export-event', true)
+        },
+        RecipeManagement() {
+            this.$http.get('/recipe_list', ).then(response => {
+                this.RecipeManagementDialogVisible = true;
+                this.dbRecipeList = response.body;
+            });
+        },
+        SaveRecipe() {
+            this.$http.post('/store_recipe', {
+                value: this.getRecipe()
+            }).then(response => {
+                this.$message.success('saving recipe successfully')
+            });
+        },
+        getRecipe() {
+            submitRecipeList = [];
+            if (this.recipe_guidance_list.length > 0) {
+                for (recipeGuidanceItem of this.recipe_guidance_list) {
+                    if (recipeGuidanceItem.steps.length > 0) {
+                        submitRecipeList = submitRecipeList.concat(recipeGuidanceItem.steps)
+                    }
+                }
+            } else {
+                submitRecipeList = this.recipe_list
+            }
+            return submitRecipeList;
+        },
+        handleReuse(recipeValue) {
+            this.$emit('reuse-recipe-event', recipeValue);
+            this.RecipeManagementDialogVisible = false;
+            this.$message.success('Reusing recipe successfully');
+        },
+        handleRemove(name) {
+            this.$http.post('/remove_recipe', {
+                name: name
+            }).then(response => {
+                this.dbRecipeList = response.body;
+            });
+        }
     },
     data() {
       return {
-        has_profiled_prop: false
+        has_profiled_prop: false,
+        domainKnowledgeDialogVisible: false,
+        domainKnowledge: {
+            needGuidance: "No",
+            singleOrMultiple: "",
+            needClean: "",
+            needSplit: "",
+            needAggregation: ""
+        },
+        recipeName: "",
+        RecipeManagementDialogVisible: false,
+        dbRecipeList: []
+
       }
     },
     watch: {
@@ -50,3 +189,8 @@
     }
   }
 </script>
+<style>
+    .question_label {
+        line-height: 40px; font-size: 14px; color: #606266; font-weight: bold
+    }
+</style>

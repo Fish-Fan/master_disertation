@@ -7,6 +7,7 @@ socketio = SocketIO()
 dataset_location = '../dataset/'
 report_html_location = '../static/report_html/'
 config_location = '../static/resources/config.ini'
+history_pattern_location = '../static/resources/recipe_skeleton.json'
 
 def create_app():
     # create an application

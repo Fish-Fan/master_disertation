@@ -25,8 +25,11 @@ var vm = new window.Vue({
         previewDataset: {},
         /*recipe list*/
         recipeList: [],
+        recipeGuidanceList: [],
         /*refresh all the data among subcomponents*/
-        refresh_key: 1
+        refresh_key: 1,
+        /*export*/
+        export_key: 1
     },
     methods: {
         is_refresh() {
@@ -62,12 +65,31 @@ var vm = new window.Vue({
             this.changeTypeColumns = message.profiling_result.change_column_type_pre;
         },
         handleRecipeEvent(message) {
-            this.recipeList.push(message);
+            //distribute this step into right guidance category
+            if (this.recipeGuidanceList.length > 0) {
+                for (recipeGuidanceItem of this.recipeGuidanceList) {
+                    if (recipeGuidanceItem.type == message.guidance_category) {
+                        recipeGuidanceItem.steps.push(message)
+                    }
+                }
+            } else {
+                this.recipeList.push(message);
+            }
             this.$message.success('successfully add one step into recipe');
         },
         handleRemoveRecipeItemEvent(message) {
             this.recipeList.splice(message.item_index, 1);
             this.$message.warning('remove one step from recipe');
+        },
+        handleRemoveRecipeGuidanceEvent(message) {
+            for (recipeGuidanceItem of this.recipeGuidanceList) {
+                if (recipeGuidanceItem.type == message.guidance_category) {
+                    recipeGuidanceItem.steps.splice(message.item_index, 1);
+                }
+            }
+        },
+        handleRecipeGuidanceEvent(message) {
+            this.recipeGuidanceList = message
         },
         handleIsLoadingEvent(message) {
             this.is_loading = message
@@ -84,6 +106,12 @@ var vm = new window.Vue({
         },
         handleHasProfiledEvent(message) {
             this.hasProfiledProp = message;
+        },
+        handleExecuteExportEvent() {
+            this.export_key += 1;
+        },
+        handleReuseRecipeEvent(message) {
+            this.recipeList = this.recipeList.concat(message);
         }
     },
     components: {

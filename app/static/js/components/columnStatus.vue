@@ -41,49 +41,49 @@
             if('valid' in message) {
                 tagObj.valid = {
                     'value': this.roundUtil(message.valid) * 100 + '%',
-                    'type': 'success'
+                    'type': 'warning'
                 }
             }
             if ('distinct' in message) {
                 tagObj.distinct = {
                     'value': this.roundUtil(message.distinct) * 100 + '%',
-                    'type': 'success'
+                    'type': 'warning'
                 }
             }
             if ('top_frequency' in message) {
                 tagObj.top_frequency = {
                     'value': message.top_frequency,
-                    'type': 'info'
+                    'type': 'success'
                 }
             }
             if ('max' in message) {
                 tagObj.max = {
                     'value': message.max,
-                    'type': 'warning'
+                    'type': 'success'
                 }
             }
             if ('min' in message) {
                 tagObj.min = {
                     'value': message.min,
-                    'type': 'warning'
+                    'type': 'success'
                 }
             }
             if ('mean' in message) {
                 tagObj.mean = {
                     'value' : message.mean,
-                    'type': 'warning'
+                    'type': 'success'
                 }
             }
             if ('median' in message) {
                 tagObj.median = {
                     'value': message.median,
-                    'type': 'warning'
+                    'type': 'success'
                 }
             }
             if ('zero' in message) {
                 tagObj.zero = {
                     'value': message.zero,
-                    'type': 'warning'
+                    'type': 'success'
                 }
             }
             if ('total' in message) {
@@ -95,7 +95,7 @@
             if ('constant' in message) {
                 tagObj.constant = {
                     'value': message.constant,
-                    'type': 'info'
+                    'type': 'danger'
                 }
             }
 

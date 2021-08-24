@@ -54,9 +54,10 @@
       addRecipe(fillItem) {
           fillItem.column = this.activeTab;
           fillMissingValueRecipe = {
-              type: 'fillMissingValue',
+              type: 'FillMissingValue',
               description: this.concatRecipeDescription(fillItem),
-              data: fillItem
+              data: fillItem,
+              guidance_category: 'clean'
           };
         this.$emit('fill-missing-value-recipe-event', fillMissingValueRecipe)
       },

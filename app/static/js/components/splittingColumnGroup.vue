@@ -103,9 +103,10 @@
         addRecipe: function(submitObj) {
             submitObj.column = this.activeTab;
             splittingColumnRecipe = {
-                type: 'splittingColumnValue',
+                type: 'SplittingColumnValue',
                 description: this.concatenateDescription(submitObj),
-                data: submitObj
+                data: submitObj,
+                guidance_category: 'enrich'
             };
             this.$emit('split-column-value-recipe-event', splittingColumnRecipe);
         },

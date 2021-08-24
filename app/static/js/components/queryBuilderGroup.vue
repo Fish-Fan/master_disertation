@@ -100,9 +100,10 @@
         },
         addRecipe() {
             var queryBuilderRecipe = {
-                type: 'queryBuilder',
+                type: 'Filter',
                 description: this.concatRecipeDescription(this.query.filterList),
-                data: this.query
+                data: this.query,
+                guidance_category: 'filter'
             };
             this.$emit('query-builder-recipe-event', queryBuilderRecipe);
          },

@@ -12,6 +12,8 @@ from ..util.DataFrameConverter import DataFrameConverter
 from ..guidance.Guidance import Guidance
 from app.guidance.MultipleFileGuidance import MultipleFileGuidance
 from app.util.ColumnFormatHelper import ColumnFormatHelper
+from app.guidance.RecipeGenerator import RecipeGenerator
+from app import fbp
 import jsons
 import pandas as pd
 import sys, traceback
@@ -112,3 +114,49 @@ def multipleFileWrangling():
         mfg = MultipleFileGuidance(None, None, data_source_1=DATASET_PATH + session.get('filenames'), data_source_2=DATASET_PATH + another_file_name)
 
     return jsons.dumps(mfg.analysis())
+
+@inquery.route('/domain_knowledge_capture', methods=['GET', 'POST'])
+def domainKnowledgeCapture():
+    domainKnowledge = request.get_json()['domain_knowledge']
+    rg = RecipeGenerator(domainKnowledge)
+    return jsons.dumps(rg.generate())
+
+@inquery.route('/store_recipe', methods=['GET', 'POST'])
+def storeRecipe():
+    repository = fbp.repository()
+    recipe_name = session['filenames'] + '_recipe'
+    recipe_value = request.get_json()['value']
+    repository.register("recipe", recipe_name, recipe_value)
+    return jsonify(recipe_value), 200, {'ContentType': 'application/json'}
+
+@inquery.route('/recipe_list', methods=['GET', 'POST'])
+def recipeList():
+    repository = fbp.repository()
+    recipe_list = repository.get("recipe")
+    if recipe_list is None:
+        return jsonify({})
+
+    result = []
+    for k, v in recipe_list.items():
+        item = {}
+        item['name'] = k
+        item['value'] = v
+        result.append(item)
+    return jsonify(result)
+
+@inquery.route('/remove_recipe', methods=['GET', 'POST'])
+def removeRecipe():
+    repository = fbp.repository()
+    recipe_name = request.get_json()['name']
+    repository.unregister("recipe", recipe_name)
+    recipe_list = repository.get("recipe")
+    if recipe_list is None:
+        return jsonify({})
+
+    result = []
+    for k, v in recipe_list.items():
+        item = {}
+        item['name'] = k
+        item['value'] = v
+        result.append(item)
+    return jsonify(result)

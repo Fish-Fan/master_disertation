@@ -120,9 +120,9 @@ define(["model/flow", "util", 'socket'], function(Flow, Util, Socket) {
             me._showEducation();
         });
 
-        footer.append("button").classed('btn btn-primary', true).text('Save Changes').attr('id', 'inquery-submit-btn').on("click", function() {
-            me._submitInqueryForm();
-        });
+        // footer.append("button").classed('btn btn-primary', true).text('Save Changes').attr('id', 'inquery-submit-btn').on("click", function() {
+        //     me._submitInqueryForm();
+        // });
 
         this._heading.append("button").classed("glyphicon glyphicon-user flowbutton", true).attr('type', 'button').attr('data-toggle', 'modal').attr('data-target', '#mymodal');
 

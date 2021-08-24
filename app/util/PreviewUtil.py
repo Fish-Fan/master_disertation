@@ -24,17 +24,17 @@ class PreviewUtil():
         column_new_type_dict = {}
         is_group_by = False
         for step in recipe_list:
-            if step['type'] == 'deleteColumn':
+            if step['type'] == 'DeleteColumn':
                 self._process_delete_operator_(step['data'])
-            elif step['type'] == 'fillMissingValue':
+            elif step['type'] == 'FillMissingValue':
                 self._proces_fill_missing_value_operator_(step['data'])
-            elif step['type'] == 'splittingColumnValue':
+            elif step['type'] == 'SplittingColumnValue':
                 self._process_split_column_operator_(step['data'])
-            elif step['type'] == 'changeColumnType':
+            elif step['type'] == 'ChangeColumnType':
                 self._process_change_column_type_operator_(step['data'], column_new_type_dict)
-            elif step['type'] == 'queryBuilder':
+            elif step['type'] == 'Filter':
                 self._process_query_bulider_operator_(step['data'])
-            elif step['type'] == 'groupby':
+            elif step['type'] == 'Aggregation':
                 is_group_by = self._process_groupby_operator_(step['data'])
             elif step['type'] == 'concat':
                 self._process_concat_operator_(step['data'], session)

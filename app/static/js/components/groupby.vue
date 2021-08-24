@@ -1,6 +1,6 @@
 <template>
   <el-form ref="form" v-loading="loading">
-        <label>choose your splitter</label>
+        <label>choose your groupby column</label>
         <el-form-item>
             <el-select class="splitter" v-model="spilitter_submit" multiple :placeholder="computePlaceholderForSplitter(category_columns)" size="mini">
                 <el-option
@@ -47,7 +47,7 @@
             if (category_columns.length > 0) {
                 return 'select'
             } else {
-                return 'Only category column can be used as a splitter'
+                return 'Only categorical column can be used as a groupby column'
             }
         },
         computeAggregationFuncs(column_name) {
@@ -98,12 +98,13 @@
         },
         addRecipe() {
             var groupByRecipe = {
-                type: 'groupby',
+                type: 'Aggregation',
                 description: this.concatRecipeDescription(this.spilitter_submit, this.column_aggregation_funcs_submit),
                 data: {
                     'splitters': this.spilitter_submit,
                     'column_aggregations': this.column_aggregation_funcs_submit
-                }
+                },
+                guidance_category: 'aggregation'
             };
             this.$emit('group-by-recipe-event', groupByRecipe);
          }

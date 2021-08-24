@@ -44,9 +44,10 @@
       addRecipe() {
         var submit_delete_column = this.computeSubmitDeleteColumns();
         deleteRecipe = {
-            type: 'deleteColumn',
+            type: 'DeleteColumn',
             description: this.concatRecipeDescription(submit_delete_column),
-            data: submit_delete_column
+            data: submit_delete_column,
+            guidance_category: 'clean'
         };
         this.$emit('delete-recipe-event', deleteRecipe)
       },

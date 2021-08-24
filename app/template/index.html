@@ -93,6 +93,7 @@
                           <display-table
                                       :key="refresh_key"
                                       :is_loading="is_loading"
+                                      :export_key="export_key"
                                       :preview_dataset="previewDataset"
                                       :highlight_columns="highlightColumnIndexes"></display-table>
                       </div>
@@ -140,23 +141,23 @@
                                         <a href="#groupby" aria-controls="groupby" role="tab" data-toggle="tab">
                                             <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
                                             <br>
-                                            Groupby
+                                            Aggregation
                                         </a>
                                     </li>
                                     <li role="presentation" style="color: #589df8">
                                         <a href="#multipleFileWrangling" aria-controls="multipleFileWrangling" role="tab" data-toggle="tab">
                                             <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
                                             <br>
-                                            multipleFileWrangling
+                                            Integration
                                         </a>
                                     </li>
-                                    <li role="presentation" style="color: #589df8">
-                                        <a href="#chart" aria-controls="chart" role="tab" data-toggle="tab">
-                                            <span class="glyphicon glyphicon-signal" aria-hidden="true"></span>
-                                            <br>
-                                            chart
-                                        </a>
-                                    </li>
+<!--                                    <li role="presentation" style="color: #589df8">-->
+<!--                                        <a href="#chart" aria-controls="chart" role="tab" data-toggle="tab">-->
+<!--                                            <span class="glyphicon glyphicon-signal" aria-hidden="true"></span>-->
+<!--                                            <br>-->
+<!--                                            chart-->
+<!--                                        </a>-->
+<!--                                    </li>-->
                                   </ul>
 
                                   <!-- Tab panes -->
@@ -251,7 +252,9 @@
                   <column-status-panel :column_profiling_result="columnProfilingResult"></column-status-panel>
                           <recipe
                                   v-on:remove-recipe-item-event="handleRemoveRecipeItemEvent"
+                                  v-on:remove-recipe-guidance-item-event="handleRemoveRecipeGuidanceEvent"
                                   :key="refresh_key"
+                                  :recipe_guidance_skeleton="recipeGuidanceList"
                                   :recipe_list="recipeList"></recipe>
 
 
@@ -265,7 +268,11 @@
                   v-on:is-loading-event="handleIsLoadingEvent"
                   v-on:profiling-event="handleProfilingEvent"
                   v-on:get-data-set-event="handleGetDatasetEvent"
+                  v-on:recipe-guidance-event="handleRecipeGuidanceEvent"
+                  v-on:execute-export-event="handleExecuteExportEvent"
+                  v-on:reuse-recipe-event="handleReuseRecipeEvent"
                   :key="refresh_key"
+                  :recipe_guidance_list="recipeGuidanceList"
                   :recipe_list="recipeList"></modal-footer>
           </div>
         </div><!-- /.modal-content -->
@@ -295,6 +302,8 @@
     <script type="text/javascript" src="{{ url_for('static', filename='element-ui/umy-ui.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='chart/chart.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='chart/vue-chartjs.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='pl-excel-exporter/lib/index.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='pl-excel-exporter/package/xlsx.core.min.js') }}"></script>
 
 
 

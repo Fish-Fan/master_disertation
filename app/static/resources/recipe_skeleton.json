@@ -1,0 +1,49 @@
+[
+  {
+    "type": "DeleteColumn",
+    "description": "Remove target columns from this dataset.",
+    "data": [
+    ]
+  },
+  {
+    "type": "FillMissingValue",
+    "description": "Fill missing value in target columns.",
+    "data": {
+
+    }
+  },
+  {
+    "type": "SplittingColumnValue",
+    "description": "Choose a delimiter to split target columns.",
+    "data": {
+
+    }
+  },
+  {
+    "type": "ChangeColumnType",
+    "description": "Change column format, make it more semantic.",
+    "data": {
+
+    }
+  },
+  {
+    "type": "Filter",
+    "description": "Filter datasets in given conditions.",
+    "data": {
+
+    }
+  },
+  {
+    "type": "Aggregation",
+    "description": "Choose your groupby column then apply aggregate functions.",
+    "data": {
+
+    }
+  },
+  {
+    "type": "Integration",
+    "description": "Integrate another file into this dataset.",
+    "data": [
+      ]
+  }
+]

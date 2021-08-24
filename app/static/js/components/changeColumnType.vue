@@ -43,9 +43,10 @@
             };
 
             var changeColumnTypeRecipe = {
-                type: 'changeColumnType',
+                type: 'ChangeColumnType',
                 description: this.concatenateDescription(data_obj),
-                data: data_obj
+                data: data_obj,
+                guidance_category: 'enrich'
             };
             this.$emit('change-column-type-event', changeColumnTypeRecipe);
         }

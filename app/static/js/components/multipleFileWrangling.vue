@@ -20,7 +20,7 @@
         </el-dialog>
       <el-tabs value="View" v-model="activeTab">
         <el-tab-pane label="Concatenation" name="Concatenation" style="margin-bottom: 20px">
-            <span slot="label"><i v-if="concatenation_recommend" class="el-icon-star-on"></i> Concatenation </span>
+            <span slot="label"><i v-if="concatenation_recommend" class="el-icon-star-on"></i> Union </span>
             <u-table
               ref="simple_table"
               :data="tableData"
@@ -112,7 +112,8 @@
               joinRecipe = {
                   type: 'join',
                   description: this.joinRecipeDescription(this.dataset_submit),
-                  data: this.computeLeftJoinSubmit()
+                  data: this.computeLeftJoinSubmit(),
+                  guidance_category: 'integration'
               };
               this.$emit('join-recipe-event', joinRecipe)
           },
@@ -124,7 +125,8 @@
               concatenationRecipe = {
                   type: 'concat',
                   description: this.concatRecipeDescription(this.dataset_submit, this.new_column_name_list_submit),
-                  data: this.new_column_name_list_submit
+                  data: this.new_column_name_list_submit,
+                  guidance_category: 'integration'
               };
               this.$emit('concat-recipe-event', concatenationRecipe)
           },

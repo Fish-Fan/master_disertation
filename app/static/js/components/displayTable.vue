@@ -73,7 +73,7 @@
 
 <script>
     module.exports = {
-        props: ['highlight_columns', 'preview_dataset', 'is_loading'],
+        props: ['highlight_columns', 'preview_dataset', 'is_loading', 'export_key'],
         devServer: {
             proxy: 'http://127.0.0.1:5000/'
         },
@@ -94,7 +94,28 @@
                     return 'warning-row'
                 }
             }
-          }
+          },
+           handleExport() {
+              // construct headers
+              let tHeader;
+              //consider aggregation scenario
+              if (this.isGroupby) {
+                  tHeader = this.columns.map(column => column.prop);
+                  tHeader.unshift(this.indexes.map(idx => idx.prop));
+              } else {
+                  tHeader = this.headers.map(header => header.prop);
+              }
+              // tabledata
+              const data = PlExportExcel.formatJson(tHeader, this.tableData);
+              // do export
+              PlExportExcel.exportJsonToExcel({
+                  header: tHeader,
+                  data: data,
+                  filename: 'demo_export',
+                  autoWidth: true,
+                  bookType: 'xlsx'
+              })
+           }
         },
         watch: {
           highlight_columns: function(newVal, oldVal) {
@@ -109,7 +130,10 @@
           },
            is_loading: function(newVal, oldVal) {
                 this.loading = newVal
-            }
+            },
+           export_key: function (newVal, oldVal) {
+                this.handleExport();
+           }
         },
         data() {
             return {

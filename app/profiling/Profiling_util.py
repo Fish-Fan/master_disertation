@@ -162,16 +162,18 @@ class Profiling_util:
             column_series = pd.Series(h.get(column_type)['raw_data'], dtype=np.dtype(column_type))
         else:
             column_series = column_df
-        # max
-        profiling_result['max'] = float(column_series.max())
-        # min
-        profiling_result['min'] = float(column_series.min())
-        # average
-        profiling_result['mean'] = round(column_series.mean(), 2)
-        # median
-        profiling_result['median'] = column_series.median()
-        # count of zero
-        profiling_result['zero'] = str(round(int(column_series.where(column_series == 0).count()) / len(column_df) * 100, 2)) + '%'
+
+        if profiling_result['valid'] > 0:
+            # max
+            profiling_result['max'] = float(column_series.max())
+            # min
+            profiling_result['min'] = float(column_series.min())
+            # average
+            profiling_result['mean'] = round(column_series.mean(), 2)
+            # median
+            profiling_result['median'] = column_series.median()
+            # count of zero
+            profiling_result['zero'] = str(round(int(column_series.where(column_series == 0).count()) / len(column_df) * 100, 2)) + '%'
 
     def _profiling_column_detect_constant_column_(self, column_df, profiling_result):
         value_frequency_map = column_df.value_counts().to_dict()
@@ -185,3 +187,5 @@ class Profiling_util:
             column_util = ColumnUtil(column_df)
             h = column_util.getColumnTypeHistogram(type=column_type)
             profiling_result['valid'] = h.get(column_type)['count'] / len(column_df)
+
+
