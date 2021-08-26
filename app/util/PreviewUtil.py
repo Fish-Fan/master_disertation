@@ -7,6 +7,7 @@ from flask import session
 from app.util.ColumnFormatHelper import ColumnFormatHelper
 from app.guidance.Guidance import Guidance
 from collections import OrderedDict
+from app.util.ElaspeDecorator import elapse_decorator
 
 class PreviewUtil():
     def __init__(self, source, data_path):
@@ -16,7 +17,6 @@ class PreviewUtil():
         self.data_path = data_path
         # for multiple files data wrangling use
         self.wrangling_index = 0
-
 
 
     def getPreviewJson(self, param, session):
@@ -63,17 +63,18 @@ class PreviewUtil():
 
         return column_type_dict
 
-
+    @elapse_decorator
     def _process_delete_operator_(self, deleteParam):
         if deleteParam:
             self.df = self.df.drop(deleteParam, axis=1)
 
+    @elapse_decorator
     def _proces_fill_missing_value_operator_(self, fillItem):
         column = fillItem['column']
         fillValue = fillItem['fillValue']
         self.df[column] = self.df[column].fillna(fillValue)
 
-
+    @elapse_decorator
     def _process_split_column_operator_(self, splitItem):
         column = splitItem['column']
         newColumns = []
@@ -82,7 +83,7 @@ class PreviewUtil():
         delimiter = splitItem['delimiter']
         self.df[newColumns] = self.df[column].str.split(delimiter, expand=True)
 
-
+    @elapse_decorator
     def _process_change_column_type_operator_(self, changeTypeItem, column_new_type_dict):
         column = changeTypeItem['column']
         newType = changeTypeItem['data']['type']
@@ -103,6 +104,7 @@ class PreviewUtil():
     #     else:
     #         self.df[column_name] = self.df[column_name].astype('string')
 
+    @elapse_decorator
     def _process_query_bulider_operator_(self, queryBuilderParam):
         match_type = queryBuilderParam['matchType']
         filter_list = queryBuilderParam['filterList']
@@ -145,6 +147,7 @@ class PreviewUtil():
         # pre process dataset
         self.df = self.df.query(expression)
 
+    @elapse_decorator
     def _process_groupby_operator_(self, groupbyParam):
         splitters = groupbyParam['splitters']
         column_aggregations = groupbyParam['column_aggregations']
@@ -170,6 +173,7 @@ class PreviewUtil():
 
         return True
 
+    @elapse_decorator
     def _process_concat_operator_(self, concatParam, session):
         new_column_name_list = concatParam
         new_df_obj = self._get_new_df_from_session_(session)
@@ -189,6 +193,7 @@ class PreviewUtil():
         new_wrangling_df.columns = d.keys()
         self.df = pd.concat([self.df, new_wrangling_df], ignore_index=True, sort=False)
 
+    @elapse_decorator
     def _process_join_operator_(self, joinParam, session):
         new_df_obj = self._get_new_df_from_session_(session)
         new_wrangling_df = new_df_obj['data_frame']

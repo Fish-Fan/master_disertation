@@ -3,6 +3,7 @@ from app.util.ColumnFormatHelper import ColumnFormatHelper
 import pandas as pd
 from difflib import SequenceMatcher
 from collections import defaultdict
+from app.util.ElaspeDecorator import elapse_decorator
 
 class MarkingResult:
     def __init__(self):
@@ -17,7 +18,7 @@ class ConcatenateDetectionUtil:
         self.df1 = df1
         self.df2 = df2
 
-
+    @elapse_decorator
     def marking(self):
         # remove non string columns
         self._drop_non_string_columns_()

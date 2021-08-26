@@ -1,11 +1,13 @@
 import pandas as pd
 from collections import OrderedDict
+from app.util.ElaspeDecorator import elapse_decorator
 
 class JoinDetectionUtil:
     def __init__(self, df1, df2):
         self.df1 = df1
         self.df2 = df2
 
+    @elapse_decorator
     def marking(self):
         # get unique key of each column
         unique_key_df1 = self._getUniqueValueOfEachColumn_(self.df1)

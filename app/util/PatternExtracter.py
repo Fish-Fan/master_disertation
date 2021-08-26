@@ -10,8 +10,11 @@ class PatternExtracter:
         x = re.escape(id)
         ch = ConfigparserHelper()
         delimiter = ch.getValue('regx', 'delimiter')
+        # replace delimiter with (delimiter)
         x = re.sub(r'([^a-zA-Z0-9]+['+ delimiter +']*[\s]*)', r'(\1)', x)
+        # replace words with [a-zA-Z]+
         x = re.sub(r'[a-zA-Z]+', r'([A-Z]+)', x)
+        # replace digits with [0-9]+
         x = re.sub(r'[0-9]+', r'([0-9]+)', x)
         return '^' + x + '$'
 

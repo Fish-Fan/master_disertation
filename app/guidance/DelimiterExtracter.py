@@ -115,3 +115,8 @@ if __name__ == '__main__':
     de = DelimiterExtracter(phone_samples)
     delimiterSet = de.extractBestDelimiter()
     print(delimiterSet)
+
+
+    pe = PatternExtracter(email_samples)
+    ans = pe.determineRegex()
+    print(ans)

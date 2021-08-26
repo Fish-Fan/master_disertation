@@ -3,6 +3,8 @@ import jsons
 from app.util.ColumnFormatHelper import ColumnFormatHelper
 from collections import defaultdict, OrderedDict
 from app.guidance.Preparator import ListColumnPreparator, DeleteColumnPreparator, FillMissingValuePreparator, SplitColumnPreparator, ChangeColumnTypePreparator
+from app.util.ElaspeDecorator import elapse_decorator
+
 class Guidance:
     def __init__(self, source, columnTypeMap, data_frame=None):
         self.source = source

@@ -2,6 +2,7 @@ import pandas as pd
 from app.util.ConcatenateDetectionUtil import ConcatenateDetectionUtil
 from app.util.JoinDetectionUtil import JoinDetectionUtil
 from app.util.ColumnFormatHelper import ColumnFormatHelper
+from app.util.ElaspeDecorator import elapse_decorator
 
 class MultipleFileGuidance:
     def __init__(self, data_frame_1, data_frame_2, data_source_1=None, data_source_2=None):
@@ -13,7 +14,7 @@ class MultipleFileGuidance:
         if data_source_2:
             self.data_frame_2 = pd.read_csv(data_source_2)
 
-
+    @elapse_decorator
     def analysis(self):
         ans = {}
         cdt = ConcatenateDetectionUtil(self.data_frame_1, self.data_frame_2)

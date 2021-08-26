@@ -25,11 +25,6 @@ class RecipeGenerator:
                 "description": "Choose a delimiter to split target columns or change column format, make it more semantic.",
                 "steps": []
               })
-        result.append({
-            "type": "filter",
-            "description": "Filter datasets in given conditions.",
-            "steps": []
-        })
         if self.domain_knowledge['singleOrMultiple'] == "Multiple":
             result.append({
                 "type": "integration",
@@ -37,7 +32,11 @@ class RecipeGenerator:
                 "steps": [
                   ]
               })
-
+        result.append({
+            "type": "filter",
+            "description": "Filter datasets in given conditions.",
+            "steps": []
+        })
         if self.domain_knowledge['needAggregation'] == "Yes":
             result.append({
                 "type": "aggregation",

@@ -5,6 +5,7 @@ from app.guidance.DelimiterExtracter import DelimiterExtracter
 from app.util.ColumnUtil import ColumnUtil
 from collections import defaultdict, OrderedDict
 from app.util.ColumnFormatHelper import ColumnFormatHelper
+from app.util.ElaspeDecorator import elapse_decorator
 import jsons
 
 class Preparator:
@@ -23,6 +24,7 @@ class MarkingResult:
         self.recommend = False
 
 class ListColumnPreparator(Preparator):
+    @elapse_decorator
     def getColumnList(self):
         column_arr = []
         for key, column in self.columnIndexMap.items():
@@ -30,6 +32,7 @@ class ListColumnPreparator(Preparator):
         return column_arr
 
 class DeleteColumnPreparator(Preparator):
+    @elapse_decorator
     def marking(self):
         markResList = []
         self._getMissingValueColumns_(markResList)
@@ -69,6 +72,7 @@ class DeleteColumnPreparator(Preparator):
             markResList.append(MarkingResult(score, column_name, self.columnIndexMap.get(column_name)['index'], None, description='zero'))
 
 class FillMissingValuePreparator(Preparator):
+    @elapse_decorator
     def marking(self):
         df = self.dataframe.copy()
         df1 = df.loc[:, (df.isnull()).any()]
@@ -118,6 +122,7 @@ class FillMissingValuePreparator(Preparator):
         return data
 
 class SplitColumnPreparator(Preparator):
+    @elapse_decorator
     def marking(self):
         df = self.dataframe.copy()
         columns = list(df.columns)
@@ -136,6 +141,7 @@ class SplitColumnPreparator(Preparator):
 
 
 class ChangeColumnTypePreparator(Preparator):
+    @elapse_decorator
     def marking(self):
         df = self.dataframe.copy()
         columns = list(df.columns)
