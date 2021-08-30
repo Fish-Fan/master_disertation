@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
 from app.util.ConfigparserHelper import ConfigparserHelper
+from app.util.ElaspeDecorator import elapse_decorator
 
 class PatternExtracter:
     def __init__(self, strList):
