@@ -27,7 +27,7 @@ class PatternExtracter:
 
         for i in range(PROCESSOR_COUNT):
             data_shard = self.sharding_data(i, len(self.strList) // PROCESSOR_COUNT)
-            pool.apply_async(self.single_process_task, args=(data_shard), callback=self.multi_process_call_back)
+            pool.apply_async(self.single_process_task, args=(data_shard, ), callback=self.multi_process_call_back)
 
         pool.close()
         pool.join()
@@ -44,7 +44,7 @@ class PatternExtracter:
     def multi_process_call_back(self, result):
         global patterns_global
         for key in result.keys():
-            patterns_global[key].append(result.get(key))
+            patterns_global[key].extend(result.get(key))
 
     def sharding_data(self, i, size):
         if (i+1) * size > len(self.strList):

@@ -117,6 +117,7 @@
                     new_column_item.operators = column_item.operators;
                     new_column_item.set_by_manual = column_item.set_by_manual;
                     new_column_item.type = column_item.type;
+                    new_column_item.categories = column_item.categories;
                     new_column_item.value = "";
                     this.query.filterList.push(new_column_item);
                 }
