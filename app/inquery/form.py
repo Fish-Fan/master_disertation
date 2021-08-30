@@ -26,8 +26,7 @@ REPORT_HTML_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), repo
 @inquery.route("/dataset", methods=['GET', 'POST'])
 def getDataset():
     filenames = [f for f in listdir(DATASET_PATH) if os.path.isfile(os.path.join(DATASET_PATH, f))]
-    print(filenames)
-    return jsonify(filenames)
+    return jsonify(sorted(filenames))
 
 # receive user picked filename
 @inquery.route("/post_files", methods=['GET', 'POST'])

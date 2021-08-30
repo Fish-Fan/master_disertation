@@ -6,6 +6,6 @@ def elapse_decorator(func):
         start_time = time.time()
         result = func(*args, **kwargs)
         end_time = time.time()
-        print('the elapse time of {} function is {}'.format(func.__qualname__, end_time - start_time))
+        print('elapse time : {} executing function : {}'.format(end_time - start_time, func.__qualname__))
         return result
     return wrapper

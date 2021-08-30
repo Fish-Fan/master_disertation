@@ -18,7 +18,7 @@ class PreviewUtil():
         # for multiple files data wrangling use
         self.wrangling_index = 0
 
-
+    @elapse_decorator
     def getPreviewJson(self, param, session):
         recipe_list = param['recipe_list']
         column_new_type_dict = {}
