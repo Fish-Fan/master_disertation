@@ -273,6 +273,7 @@
                   v-on:reuse-recipe-event="handleReuseRecipeEvent"
                   :key="refresh_key"
                   :recipe_guidance_list="recipeGuidanceList"
+                  :preview_dataset="previewDataset"
                   :recipe_list="recipeList"></modal-footer>
           </div>
         </div><!-- /.modal-content -->
@@ -305,6 +306,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='pl-excel-exporter/lib/index.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='pl-excel-exporter/package/xlsx.core.min.js') }}"></script>
 
+  <script src="https://cdn.jsdelivr.net/npm/vue-blob-json-csv@latest/dist/VueBlobJsonCsv.umd.min.js"></script>
 
 
     <script src="{{ url_for('static', filename='js/inquery/app.js') }}"></script>

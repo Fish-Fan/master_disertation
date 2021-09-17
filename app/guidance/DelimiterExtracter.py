@@ -5,6 +5,9 @@ from collections import OrderedDict
 from difflib import SequenceMatcher
 from app.util.PatternExtracter import PatternExtracter
 from app.util.ConfigparserHelper import ConfigparserHelper
+from app.util.ElaspeDecorator import elapse_decorator
+import multiprocessing as mp
+import numpy as np
 
 class DelimiterExtracter:
     def __init__(self, strList):
@@ -23,6 +26,7 @@ class DelimiterExtracter:
                 delimiterSet.append(delimiter)
         return set(delimiterSet)
 
+    @elapse_decorator
     def extractDelimiterSet(self):
         pattern_extracter = PatternExtracter(self.strList)
         counters = pattern_extracter.determineRegex()
@@ -31,19 +35,45 @@ class DelimiterExtracter:
         for delimiter in delimiterSet:
             max_count_split_columns = 0
             score_arr = []
-            for row in self.strList:
+            for row in counters.keys():
+                if delimiter == '-':
+                    row = re.sub(r'\\-', '^', row)
+                    delimiter = '^'
+                row = re.sub(r'\\', '', row)
+                row = re.sub(r'[()+]', '', row)[1:-1]
                 split_arr = row.split(delimiter)
                 max_count_split_columns = max(max_count_split_columns, len(split_arr))
                 ratio_arr = []
                 for i in range(len(split_arr) - 1):
-                    r1, r2 = pattern_extracter.str_to_regex(split_arr[i]), pattern_extracter.str_to_regex(split_arr[i + 1])
+                    r1, r2 = pattern_extracter.str_to_regex(split_arr[i]), pattern_extracter.str_to_regex(
+                        split_arr[i + 1])
                     ratio_arr.append(self._similiar_(r1, r2))
                 if ratio_arr:
                     score_arr.append(sum(ratio_arr) / len(ratio_arr))
                 else:
                     score_arr.append(1.0)
             meanScore = pd.Series(score_arr).mean()
+            if delimiter == '^':
+                delimiter = '-'
             score_dict[delimiter] = {'max_split_column_count': max_count_split_columns, 'score': meanScore}
+
+            # global score_count_arr
+            # score_count_arr = []
+            # PROCESS_COUNT = mp.cpu_count() // 2
+            # pool = mp.Pool(PROCESS_COUNT)
+            #
+            # for i in range(PROCESS_COUNT):
+            #     data_shard = self.sharding_data(i, len(self.strList) // PROCESS_COUNT)
+            #     pool.apply_async(self.single_processor_task, args=(delimiter, pattern_extracter, data_shard), callback=self.multi_process_call_back)
+            #
+            # pool.close()
+            # pool.join()
+            #
+            #
+            # tmpDf = pd.DataFrame(np.array(score_count_arr), columns=['score', 'region_count'])
+            # meanScore = tmpDf['score'].mean()
+            # max_count_split_columns = tmpDf['region_count'].max()
+            # score_dict[delimiter] = {'max_split_column_count': max_count_split_columns, 'score': meanScore}
         d = OrderedDict(sorted(score_dict.items(), key=lambda t: t[1]['score'], reverse=True))
         ans = []
         for key, value in d.items():
@@ -54,6 +84,21 @@ class DelimiterExtracter:
             ans.append(ans_item)
         ans.sort(key=lambda x: x['score'], reverse=True)
         return ans
+
+    def single_processor_task(self, delimiter, pattern_extracter, counters):
+        arr = []
+        for row in counters.keys():
+            split_arr = row.split(delimiter)
+            ratio_arr = []
+            for i in range(len(split_arr) - 1):
+                r1, r2 = pattern_extracter.str_to_regex(split_arr[i]), pattern_extracter.str_to_regex(split_arr[i + 1])
+                ratio_arr.append(self._similiar_(r1, r2))
+            if ratio_arr:
+                arr.append([sum(ratio_arr) / len(ratio_arr), len(split_arr)])
+            else:
+                arr.append([1.0, len(split_arr)])
+        return arr
+
 
     def extractBestDelimiter(self):
         pass

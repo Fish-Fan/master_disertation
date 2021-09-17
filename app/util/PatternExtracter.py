@@ -2,11 +2,11 @@ import re
 from collections import defaultdict
 from app.util.ConfigparserHelper import ConfigparserHelper
 from app.util.ElaspeDecorator import elapse_decorator
+import multiprocessing as mp
 
 class PatternExtracter:
     def __init__(self, strList):
         self.strList = strList
-
     def str_to_regex(self, id):
         x = re.escape(id)
         ch = ConfigparserHelper()
@@ -18,11 +18,40 @@ class PatternExtracter:
         # replace digits with [0-9]+
         x = re.sub(r'[0-9]+', r'([0-9]+)', x)
         return '^' + x + '$'
-
+    @elapse_decorator
     def determineRegex(self):
+        global patterns_global
+        patterns_global = defaultdict(list)
+        # only use half cores of total CPU
+        PROCESSOR_COUNT = mp.cpu_count() // 2
+        # initialise process pool
+        pool = mp.Pool(PROCESSOR_COUNT)
+
+        for i in range(PROCESSOR_COUNT):
+            # split data into shardings
+            data_shard = self.sharding_data(i, len(self.strList) // PROCESSOR_COUNT)
+            # launch each process
+            pool.apply_async(self.single_process_task, args=(data_shard, ), callback=self.multi_process_call_back)
+
+        pool.close()
+        pool.join()
+
+        return patterns_global
+    # mapping function
+    def single_process_task(self, data_shard):
         patterns = defaultdict(list)
-        for id in self.strList:
+        for id in data_shard:
             pattern = self.str_to_regex(id)
             patterns[pattern].append(id)
-
         return patterns
+    # reduce function
+    def multi_process_call_back(self, result):
+        global patterns_global
+        for key in result.keys():
+            patterns_global[key].extend(result.get(key))
+    # sharding algorithm
+    def sharding_data(self, i, size):
+        if (i+1) * size > len(self.strList):
+            return self.strList[i*size:]
+        else:
+            return self.strList[i*size:(i+1)*size]

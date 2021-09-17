@@ -1,8 +1,15 @@
 <template>
     <div style="float: left">
         <el-button size="mini" v-if="has_profiled_prop" type="primary" @click="preview">Preview</el-button>
-        <el-button size="mini" v-else type="primary" @click="profiling">profiling</el-button>
-        <el-button size="mini" type="button" type="info" @click="handleExport">Export</el-button>
+        <el-button size="mini" v-else type="primary" @click="profiling">Load Dataset</el-button>
+
+        <vue-blob-json-csv
+          file-type="csv"
+          file-name="export_file"
+          :data="preview_dataset.tableData"
+        >
+            <el-button size="mini" type="button" type="info">Export</el-button>
+        </vue-blob-json-csv>
         <el-button size="mini" type="button" type="info" @click="RecipeManagement">Manage Recipe</el-button>
         <el-button size="mini" type="button" type="info" data-dismiss="modal">Close</el-button>
 
@@ -83,7 +90,7 @@
 </template>
 <script>
   module.exports = {
-    props: ['recipe_list', 'recipe_guidance_list'],
+    props: ['recipe_list', 'recipe_guidance_list', 'preview_dataset'],
     devServer: {
         proxy: 'http://127.0.0.1:5000/'
     },

@@ -113,7 +113,7 @@
                   data: data,
                   filename: 'demo_export',
                   autoWidth: true,
-                  bookType: 'xlsx'
+                  bookType: 'csv'
               })
            }
         },

@@ -1,3 +1,4 @@
+Vue.use(VueBlobJsonCsv.default);
 var vm = new window.Vue({
     el: '#inquery-modal',
     devServer: {
