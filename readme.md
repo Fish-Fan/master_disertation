@@ -21,7 +21,7 @@ In order to achieve the objectives we list for our project, some key deliverable
 
 + To devise and implement an algorithm that could discover suitable columns of each data transform type and predict parameters in each data transform operation.
 
-# dependencies:
+# Dependencies:
 Make sure you use Python 3.8 or above version.
  ```
 - bidict==0.21.2
@@ -42,6 +42,9 @@ Make sure you use Python 3.8 or above version.
 - typish==1.9.2
 - wsproto==1.0.0
  ```
+
+# Username and password
+Any username or password can be accepted when you first login into system
 
 # Click here to get started
 ![1632910949108](https://user-images.githubusercontent.com/16412949/135250964-361c913a-af4d-4fa2-b0d4-570f05b8a649.jpg)
