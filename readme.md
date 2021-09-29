@@ -21,7 +21,8 @@ In order to achieve the objectives we list for our project, some key deliverable
 
 + To devise and implement an algorithm that could discover suitable columns of each data transform type and predict parameters in each data transform operation.
 
-dependencies:
+# dependencies:
+Make sure you use Python 3.8 or above version.
  ```
 - bidict==0.21.2
 - cachelib==0.2.0
