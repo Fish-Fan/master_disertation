@@ -186,7 +186,10 @@
                                          <div class="form-group">
                                             <splitting-column-group
                                                 v-on:split-column-value-recipe-event="handleRecipeEvent"
-                                                :is_loading="is_loading"
+                                                v-on:acquire_split_column_guidance-event="handleAcquireSplitColumnGuidanceEvent"
+                                                v-on:load-icon-for-split="hanleLoadIconForSplit"
+                                                :is_loading="splitIsLoading"
+
                                                 :key="refresh_key"
                                                 :column_list="splitColumns"></splitting-column-group>
                                         </div>
@@ -271,9 +274,12 @@
                   v-on:recipe-guidance-event="handleRecipeGuidanceEvent"
                   v-on:execute-export-event="handleExecuteExportEvent"
                   v-on:reuse-recipe-event="handleReuseRecipeEvent"
+                  v-on:split-guidance-response="splitGuidanceResponse"
+                  v-on:split-is-loading-event="SplitIsLoadingEvent"
                   :key="refresh_key"
                   :recipe_guidance_list="recipeGuidanceList"
                   :preview_dataset="previewDataset"
+                  :split_column_indicator="splitColumnIndicator"
                   :recipe_list="recipeList"></modal-footer>
           </div>
         </div><!-- /.modal-content -->

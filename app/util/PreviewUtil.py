@@ -213,6 +213,38 @@ class PreviewUtil():
         self.wrangling_index += 1
         return ans
 
+    def get_split_column_guidance(self, param, session):
+        recipe_list = param['recipe_list']
+        column_new_type_dict = {}
+        is_group_by = False
+        for step in recipe_list:
+            if step['type'] == 'DeleteColumn':
+                self._process_delete_operator_(step['data'])
+            elif step['type'] == 'FillMissingValue':
+                self._proces_fill_missing_value_operator_(step['data'])
+            elif step['type'] == 'SplittingColumnValue':
+                self._process_split_column_operator_(step['data'])
+            elif step['type'] == 'ChangeColumnType':
+                self._process_change_column_type_operator_(step['data'], column_new_type_dict)
+            elif step['type'] == 'Filter':
+                self._process_query_bulider_operator_(step['data'])
+            elif step['type'] == 'Aggregation':
+                is_group_by = self._process_groupby_operator_(step['data'])
+            elif step['type'] == 'concat':
+                self._process_concat_operator_(step['data'], session)
+            elif step['type'] == 'join':
+                self._process_join_operator_(step['data'], session)
+
+        ans = {}
+        # update column type before doing analysis
+        column_type_dict = self._get_updated_column_type_dict_(column_new_type_dict)
+        dfc = DataFrameConverter(self.df, None)
+        ans['preview_dataset'] = dfc.doConvert(column_type_dict, isGroupby=is_group_by)
+        session['column_type_dict'] = column_type_dict
+        g = Guidance(None, column_type_dict, data_frame=self.df)
+        ans['profiling_result'] = g.split_column_guidance()
+        return jsons.dumps(ans)
+
 if __name__ == '__main__':
     pu = PreviewUtil('../dataset/new_uk_500.csv')
     param = {

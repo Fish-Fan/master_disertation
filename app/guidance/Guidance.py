@@ -26,14 +26,16 @@ class Guidance:
         fill_missing_value_pre = FillMissingValuePreparator('fill_missing_value_pre', self.df, self.columnTypeMap)
         ans['fill_missing_value_pre'] = fill_missing_value_pre.marking()
 
-        split_column_pre = SplitColumnPreparator('split_column_pre', self.df, self.columnTypeMap)
-        ans['split_column_pre'] = split_column_pre.marking()
-
         change_column_pre = ChangeColumnTypePreparator('change_column_pre', self.df, self.columnTypeMap)
         ans['change_column_type_pre'] = change_column_pre.marking()
 
         self.score_based_algorithm(ans)
         return ans
+
+    # in order to improve application performance, separate this method out from analysis
+    def split_column_guidance(self):
+        split_column_pre = SplitColumnPreparator('split_column_pre', self.df, self.columnTypeMap)
+        return split_column_pre.marking()
 
 
     def score_based_algorithm(self, preparator_collection):

@@ -1,5 +1,7 @@
 <template>
-    <el-tabs v-model="activeTab" tab-position="top" v-loading="loading">
+    <div>
+        <el-button size="mini" type="primary" @click="getGuidance">Check available columns</el-button>
+        <el-tabs v-model="activeTab" tab-position="top" v-loading="loading">
         <el-tab-pane
                 v-for="column_item_obj in submitSplitColumns"
                 :key="'splitting-tab-' + column_item_obj.index"
@@ -27,6 +29,7 @@
             </el-form>
         </el-tab-pane>
     </el-tabs>
+    </div>
 </template>
 
 <script>
@@ -118,6 +121,10 @@
             new_column_name_str = new_column_name_str.substring(0, new_column_name_str.length-1);
              new_column_name_str += ']';
             return 'Using "' + submitObj.delimiter + '" as a delimiter to split ' + submitObj.column + ' into ' + submitObj.new_column_name_list.length + ' parts, new columns names as the following: ' + new_column_name_str;
+        },
+        getGuidance() {
+            this.$emit('acquire_split_column_guidance-event', true);
+            this.$emit('load-icon-for-split', true)
         }
     },
     computed: {

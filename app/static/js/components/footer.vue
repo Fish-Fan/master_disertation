@@ -1,19 +1,20 @@
 <template>
-    <div style="float: left">
-        <el-button size="mini" v-if="has_profiled_prop" type="primary" @click="preview">Preview</el-button>
-        <el-button size="mini" v-else type="primary" @click="profiling">Load Dataset</el-button>
+    <div>
+        <el-button size="mini" v-if="has_profiled_prop" type="primary" @click="preview"  style="float: left">Preview</el-button>
+        <el-button size="mini" v-else type="primary" @click="profiling"  style="float: left">Load Dataset</el-button>
 
         <vue-blob-json-csv
           file-type="csv"
           file-name="export_file"
           :data="preview_dataset.tableData"
         >
-            <el-button size="mini" type="button" type="info">Export</el-button>
+            <el-button size="mini"  style="float: left">Export</el-button>
         </vue-blob-json-csv>
-        <el-button size="mini" type="button" type="info" @click="RecipeManagement">Manage Recipe</el-button>
-        <el-button size="mini" type="button" type="info" data-dismiss="modal">Close</el-button>
+        <el-button size="mini"  @click="RecipeManagement"  style="float: left">Manage Recipe</el-button>
+        <el-button size="mini"  @click="uploadFile"  style="float: left">Upload</el-button>
+        <el-button size="mini" type="success" data-dismiss="modal" style="float: right" @click="SaveRecipe">Save</el-button>
+        <el-button size="mini"data-dismiss="modal" style="float: right">Close</el-button>
 
-        <el-button size="mini" type="button" type="success" data-dismiss="modal" @click="SaveRecipe">Save</el-button>
 
 
         <el-dialog
@@ -59,6 +60,22 @@
         </el-dialog>
 
         <el-dialog
+              title="Upload File"
+              :visible.sync="uploadDialogVisible"
+                style="text-align: left"
+              >
+            <el-upload
+                  class="upload-demo"
+                  drag
+                  action="http://127.0.0.1:5000/upload_file"
+                  multiple>
+                  <i class="el-icon-upload"></i>
+                  <div class="el-upload__text">Drag and drop your file here, or<em>click here to upload</em></div>
+                  <div class="el-upload__tip" slot="tip">only support CSV format file</div>
+                </el-upload>
+        </el-dialog>
+
+        <el-dialog
               title="Recipe management"
               :visible.sync="RecipeManagementDialogVisible"
                 style="text-align: left"
@@ -85,12 +102,11 @@
               </u-table-column>
             </u-table>
         </el-dialog>
-
     </div>
 </template>
 <script>
   module.exports = {
-    props: ['recipe_list', 'recipe_guidance_list', 'preview_dataset'],
+    props: ['recipe_list', 'recipe_guidance_list', 'preview_dataset', 'split_column_indicator'],
     devServer: {
         proxy: 'http://127.0.0.1:5000/'
     },
@@ -172,6 +188,22 @@
             }).then(response => {
                 this.dbRecipeList = response.body;
             });
+        },
+        handleSplitColumnGuidance() {
+            let submitRecipeList = this.getRecipe();
+            this.$http.post('/split_guidance', {
+                    recipe_list: submitRecipeList
+                }).then(response => {
+                    if (response.body.code == 500) {
+                        this.$message.error(response.body.message);
+                    } else {
+                        this.$emit('split-guidance-response', response.body);
+                    }
+                    this.$emit('split-is-loading-event', false);
+                })
+        },
+        uploadFile() {
+            this.uploadDialogVisible = true
         }
     },
     data() {
@@ -187,12 +219,14 @@
         },
         recipeName: "",
         RecipeManagementDialogVisible: false,
-        dbRecipeList: []
-
+        dbRecipeList: [],
+        uploadDialogVisible: false
       }
     },
     watch: {
-
+        split_column_indicator: function (oldVal, newVal) {
+            this.handleSplitColumnGuidance();
+        }
     }
   }
 </script>

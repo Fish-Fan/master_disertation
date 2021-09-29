@@ -13,6 +13,8 @@ from ..guidance.Guidance import Guidance
 from app.guidance.MultipleFileGuidance import MultipleFileGuidance
 from app.util.ColumnFormatHelper import ColumnFormatHelper
 from app.guidance.RecipeGenerator import RecipeGenerator
+from app.guidance.Guidance import SplitColumnPreparator
+from werkzeug.utils import secure_filename
 from app import fbp
 import jsons
 import pandas as pd
@@ -159,3 +161,32 @@ def removeRecipe():
         item['value'] = v
         result.append(item)
     return jsonify(result)
+
+@inquery.route('/split_guidance', methods=['GET', 'POST'])
+def splitGuidance():
+    filenames = session['filenames']
+    pu = PreviewUtil(DATASET_PATH + filenames, DATASET_PATH)
+    try:
+        tmp = pu.get_split_column_guidance(request.get_json(), session)
+        return tmp
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({'code': 500, 'message': 'preview failure'}), 200, {'ContentType': 'application/json'}
+
+@inquery.route('/upload_file', methods=['GET', 'POST'])
+def uploadFile():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            print('no files has been selected')
+        file = request.files.get('file')
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(DATASET_PATH, filename))
+            return jsonify({'code': 500, 'message': 'preview failure'}), 200, {'ContentType': 'application/json'}
+        else:
+            return jsonify({'code': 500, 'message': 'preview failure'}), 200, {'ContentType': 'application/json'}
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ['csv']

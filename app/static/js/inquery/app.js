@@ -30,7 +30,10 @@ var vm = new window.Vue({
         /*refresh all the data among subcomponents*/
         refresh_key: 1,
         /*export*/
-        export_key: 1
+        export_key: 1,
+        /*acquire split column guidance*/
+        splitColumnIndicator: 1,
+        splitIsLoading: false
     },
     methods: {
         is_refresh() {
@@ -62,8 +65,9 @@ var vm = new window.Vue({
             this.columnList = message.profiling_result.list_column_pre;
             this.deleteColumns = message.profiling_result.delete_column_pre;
             this.fillMissingColumns = message.profiling_result.fill_missing_value_pre;
-            this.splitColumns = message.profiling_result.split_column_pre;
             this.changeTypeColumns = message.profiling_result.change_column_type_pre;
+            // empty split operator panel
+            this.splitColumns = [];
         },
         handleRecipeEvent(message) {
             //distribute this step into right guidance category
@@ -113,6 +117,24 @@ var vm = new window.Vue({
         },
         handleReuseRecipeEvent(message) {
             this.recipeList = this.recipeList.concat(message);
+        },
+        handleAcquireSplitColumnGuidanceEvent(message) {
+            this.splitColumnIndicator += 1
+        },
+        splitGuidanceResponse(message) {
+            this.splitColumns = message.profiling_result;
+            if (this.splitColumns.length == 0) {
+                this.$message({
+                    message: 'No split column suggestions available currently!',
+                    type: 'warning'
+                })
+            }
+        },
+        SplitIsLoadingEvent(message) {
+            this.splitIsLoading = false
+        },
+        hanleLoadIconForSplit() {
+            this.splitIsLoading = true
         }
     },
     components: {
